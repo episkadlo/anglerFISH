@@ -27,3 +27,10 @@ sudo vim /etc/default/docker
 ## and uncommenting the line saying 
 DOCKER_OPTS="--DNS 8.8.8.8 --DNS 8.8.4.4
 ## then restarting docker/terminal
+
+
+### pull a container with hisat2 (biocontainers) 
+docker pull quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4
+
+#confirm it work by going into interactive mode and running hisat2 --help
+sudo docker run -it quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4 
