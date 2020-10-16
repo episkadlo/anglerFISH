@@ -1,0 +1,14 @@
+#install java:
+sudo apt install openjdk-11-jre-headless
+
+#install nextflow
+curl -s https://get.nextflow.io | bash
+
+#copy the tutorial.nf workflow from nextflow tutorial and try running it to see it nextflow works
+./nextflow run tutorial.nf
+
+
+# install docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
