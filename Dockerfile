@@ -10,4 +10,6 @@ RUN apt-get install -y \
 RUN pip install --upgrade pip
 
 RUN pip install biopython==1.70
+
+COPY blockParse.py . 
 	

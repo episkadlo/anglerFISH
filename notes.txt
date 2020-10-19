@@ -24,13 +24,26 @@ docker --version
 ## there was a problem with installing python 2.7 and python-pip.
 ## what helped was changing DNS server setting. What solvedthe probelm was:
 sudo vim /etc/default/docker
-## and uncommenting the line saying 
+## and uncommenting the line saying
 DOCKER_OPTS="--DNS 8.8.8.8 --DNS 8.8.4.4
 ## then restarting docker/terminal
 
 
-### pull a container with hisat2 (biocontainers) 
+### pull a container with hisat2 (biocontainers)
 docker pull quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4
 
 #confirm it work by going into interactive mode and running hisat2 --help
-sudo docker run -it quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4 
+sudo docker run -it quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4
+
+
+## use the automatically generated $projectDir to make the pipeline portable
+
+## run the nextflow with testdocker3 - works with files
+
+## download the chr10 from mm10 from http://hgdownload.soe.ucsc.edu/goldenPath/mm10/chromosomes/
+
+## unzip by
+gunzip <file>.fa.gz
+
+## create hisat2 index
+hisat2-build <path to unzipped .fa with genome > index_name
