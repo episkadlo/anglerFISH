@@ -47,3 +47,7 @@ gunzip <file>.fa.gz
 
 ## create hisat2 index
 hisat2-build <path to unzipped .fa with genome > index_name
+
+
+## pull jellyfish docker for kmer processing
+docker pull biocontainers/jellyfish:v2.2.10-2-deb_cv1

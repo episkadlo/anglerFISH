@@ -1,0 +1,24 @@
+# Nextflow's work directory
+work/
+
+# entire genomes and indexes folder
+genomes/
+
+# UP
+
+# Logs
+
+*.log
+*.log.*
+
+# Nexftlow files
+nextflow/
+.nextflow/
+
+# Docker suppl files
+get-docker.sh
+
+# Random temporary stuff to be removed later
+tempStuff.nf
+tutorial.nf
+Nextflow_mini.nf

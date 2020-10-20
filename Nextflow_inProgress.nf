@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 params.name = ""
-params.outputName = "test_result"
+params.outputName = "${params.name}_output"
 inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
 params.l = 45
 params.L = params.l
@@ -33,7 +33,7 @@ process blockParse {
   path inFile from inFilePath
 
   output:
-  file "${params.name}_blockparse.fastq" into blockparseProcess
+  path "${params.name}_blockparse.fastq" into blockparseProcess
 
 
 	script:
@@ -81,7 +81,7 @@ process blockParse {
 process countInitialProbes {
 
   input:
-  file "${params.name}_blockparse.fastq" from blockparseProcess
+  path "${params.name}_blockparse.fastq" from blockparseProcess
 
 	output:
   stdout result into InitialNprobesProcess
@@ -100,11 +100,11 @@ process initial_mapping {
   container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
 
 	input:
-  file "${params.name}_blockparse.fastq" from blockparseProcess
-  file hs2_indices from hs2_indices.collect()
+  path "${params.name}_blockparse.fastq" from blockparseProcess
+  path hs2_indices from hs2_indices.collect()
 
 	output:
-	file "${params.name}_hisat2.sam" into initialMappingProcess
+	path "${params.name}_hisat2.sam" into initialMappingProcess
 
 	script:
 	"""
@@ -116,11 +116,14 @@ process initial_mapping {
 
 process filteringEndo {
 
+  container = 'testdocker3'
+
 	input:
-  file "${params.name}_hisat2.sam" from initialMappingProcess
+  path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
+  path "${params.name}_hisat2.sam" from initialMappingProcess
 
 	output:
-	file "${params.name}_cleaned.bed" into outputCleanProcessEndo
+	path "${params.name}_cleaned.bed" into outputCleanProcessEndo
 
   when:
   params.mode == "endo"
@@ -128,18 +131,21 @@ process filteringEndo {
 	script:
 
 	"""
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/outputClean_toFuturize.py -F ${params.F}  -f ${params.name}_hisat2.sam -o ${params.name}_cleaned -u
+	python ${outputCleanScript} -F ${params.F}  -f ${params.name}_hisat2.sam -o ${params.name}_cleaned -u
 	"""
 }
 
 
 process filteringExo {
 
+  container = 'testdocker3'
+
 	input:
-  file "${params.name}_hisat2.sam" from initialMappingProcess
+  path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
+  path "${params.name}_hisat2.sam" from initialMappingProcess
 
 	output:
-	file "${params.name}_cleaned.bed" into outputCleanProcessExo
+	path "${params.name}_cleaned.bed" into outputCleanProcessExo
 
   when:
   params.mode == "exo"
@@ -147,7 +153,7 @@ process filteringExo {
 	script:
 
 	"""
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/outputClean_toFuturize.py -F ${params.F} -f ${params.name}_hisat2.sam -o ${params.name}_cleaned --zero
+	python ${outputCleanScript} -F ${params.F} -f ${params.name}_hisat2.sam -o ${params.name}_cleaned --zero
 	"""
 }
 
@@ -156,18 +162,21 @@ process filteringExo {
 
 process checkStrand {
 
+  container = 'testdocker3'
+
   input:
-  file "${params.name}_cleaned.bed" from outputCleanProcessEndo.mix(outputCleanProcessExo)
+  path "${params.name}_cleaned.bed" from outputCleanProcessEndo.mix(outputCleanProcessExo)
+  path probeRCScript from "$projectDir/OligoMiner-master/probeRC.py"
 
   output:
-  file "${params.name}_strandChecked.bed" into checkStrandProcess
+  path "${params.name}_strandChecked.bed" into checkStrandProcess
 
 
   script:
 
   if ((params.strand == "+" & params.mode == "endo") || params.mode == "exo")
     """
-    python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/probeRC_toFuturize.py -f ${params.name}_cleaned.bed -o ${params.name}_strandChecked
+    python ${probeRCScript} -f ${params.name}_cleaned.bed -o ${params.name}_strandChecked
     """
 
   else
@@ -179,8 +188,11 @@ process checkStrand {
 
 process kmerFilter {
 
+  container 'biocontainers/jellyfish:v2.2.10-2-deb_cv1'
+
 	input:
-  file "${params.name}_strandChecked.bed" from checkStrandProcess
+  path "${params.name}_strandChecked.bed" from checkStrandProcess
+  path kmerFilterScript from "$projectDir/OligoMiner-master/kmerFilter.py"
 
 	output:
   file "${params.name}_kmerFilter.bed" into kmerFilterProcess
@@ -188,7 +200,7 @@ process kmerFilter {
 	script:
 
 	"""
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/kmerFilter_toFuturize.py -f ${params.name}_strandChecked.bed -m ${params.m} -j /tungstenfs/scratch/gchao/OligoMiner/INDEXES/hisat2/jellyfish/${params.genome}_${params.m}.jf -k 4 -o ${params.name}_kmerFilter
+	python ${kmerFilterScript} -f ${params.name}_strandChecked.bed -m ${params.m} -j /tungstenfs/scratch/gchao/OligoMiner/INDEXES/hisat2/jellyfish/${params.genome_index}_${params.m}.jf -k 4 -o ${params.name}_kmerFilter
 	"""
 }
 
