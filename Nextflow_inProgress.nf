@@ -6,7 +6,7 @@ inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
 params.l = 45
 params.L = params.l
 params.spacing = 2
-params.F = 54
+params.F = 50
 params.s = 390
 params.g = 20
 params.G = 80
@@ -188,70 +188,78 @@ process checkStrand {
 
 process kmerFilter {
 
-  container 'biocontainers/jellyfish:v2.2.10-2-deb_cv1'
+  container = 'jellyfish_ps:1.2'
 
 	input:
   path "${params.name}_strandChecked.bed" from checkStrandProcess
   path kmerFilterScript from "$projectDir/OligoMiner-master/kmerFilter.py"
+  path jfDict from "${projectDir}/genomes/indexes/$params.genome_index/${params.genome_index}_${params.m}.jf"
 
 	output:
-  file "${params.name}_kmerFilter.bed" into kmerFilterProcess
+  path "${params.name}_kmerFilter.bed" into kmerFilterProcess
 
 	script:
 
 	"""
-	python ${kmerFilterScript} -f ${params.name}_strandChecked.bed -m ${params.m} -j /tungstenfs/scratch/gchao/OligoMiner/INDEXES/hisat2/jellyfish/${params.genome_index}_${params.m}.jf -k 4 -o ${params.name}_kmerFilter
+	python ${kmerFilterScript} -f ${params.name}_strandChecked.bed -m ${params.m} -j ${jfDict} -k 4 -o ${params.name}_kmerFilter
 	"""
 }
 
 
 process structureCheck {
 
+  // container = 'python2-nupack:1.3'
+  conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+
 	input:
-  file "${params.name}_kmerFilter.bed" from kmerFilterProcess
+  path "${params.name}_kmerFilter.bed" from kmerFilterProcess
+  path structureCheckScript from "$projectDir/OligoMiner-master/structureCheck.py"
 
 	output:
-  file "${params.name}_structureCheck.bed" into structureCheckProcessFastq, structureCheckProcessFasta
+  path "${params.name}_structureCheck.bed" into structureCheckProcessFastq, structureCheckProcessFasta
 
 	script:
 
 	"""
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/structureCheck_toFuturize.py -f ./${params.name}_kmerFilter.bed -o ${params.name}_structureCheck -t 0.05 -F ${params.F} --hybTemp ${params.hybrTemp}
+	python ${structureCheckScript} -f ${params.name}_kmerFilter.bed -o ${params.name}_structureCheck -t 0.05 -F ${params.F} --hybTemp ${params.hybrTemp}
 	"""
 }
 
 
 process bed2fasta {
 
+  conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+
 	input:
-  file "${params.name}_structureCheck.bed" from structureCheckProcessFasta
+  path "${params.name}_structureCheck.bed" from structureCheckProcessFasta
+  path bed2FastaScript from "$projectDir/helperScripts/customBed2Fasta.py"
 
 	output:
-	file "${params.name}_finalProbes.fasta" into bed2fastaProcessEndoZip, bed2fastaProcessExoZip, bed2fastaProcessExoAlign, bed2fastaProcessRevCompl, bed2fastaProcessTab
+	path "${params.name}_finalProbes.fasta" into bed2fastaProcessEndoZip, bed2fastaProcessExoZip, bed2fastaProcessExoAlign, bed2fastaProcessRevCompl, bed2fastaProcessTab
 
 	script:
 
 	"""
-	cp ${params.name}_structureCheck.bed /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts//bed2fasta/FilesToChange/
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/bed2fasta/customBed2Fasta.py
-	cp /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/bed2fasta/ProbesFa/${params.name}_structureCheck.fasta ${params.name}_finalProbes.fasta
-	rm /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts//bed2fasta/FilesToChange/*
-  rm /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/bed2fasta/ProbesFa/*
+  python ${bed2FastaScript} -f "${params.name}_structureCheck.bed" -o "_finalProbes"
 	"""
 }
 
 
 process bed2fastq {
 
+  container = 'testdocker3'
+
+
 	input:
-  file "${params.name}_structureCheck.bed" from structureCheckProcessFastq
+  path "${params.name}_structureCheck.bed" from structureCheckProcessFastq
+  path bedToFastqScript from "$projectDir/OligoMiner-master/bedToFastq.py"
 
 	output:
-  file "${params.name}_finalProbes.fastq" into finalFastqProcessMapping, finalFastqProcessCount
+  path "${params.name}_finalProbes.fastq" into finalFastqProcessMapping, finalFastqProcessCount
 
   script:
 	"""
-	python /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/bedToFastq_toFuturize.py -f ${params.name}_structureCheck.bed  -o ${params.name}_finalProbes
+	python ${bedToFastqScript} -f ${params.name}_structureCheck.bed  -o ${params.name}_finalProbes
 	"""
 }
 
@@ -259,7 +267,7 @@ process bed2fastq {
 process countFinalProbes {
 
 	input:
-  file "${params.name}_finalProbes.fastq" from finalFastqProcessCount
+  path "${params.name}_finalProbes.fastq" from finalFastqProcessCount
 
 	output:
   stdout result into FinalNprobesProcess
@@ -275,10 +283,10 @@ process countFinalProbes {
 process mappingFinalProbes {
 
 	input:
-  file "${params.name}_finalProbes.fastq" from finalFastqProcessMapping
+  path "${params.name}_finalProbes.fastq" from finalFastqProcessMapping
 
 	output:
-  file "${params.name}_finalProbes.sam" into mappingFinalProcess
+  path "${params.name}_finalProbes.sam" into mappingFinalProcess
 
   when:
   params.mode == "endo"

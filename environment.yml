@@ -1,0 +1,11 @@
+name: envForStructureCheck
+channels:
+  - beliveau-lab
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - biopython=1.70
+  - nupack=3.0.6
+  - pip=20.1.1
+  - python=2.7

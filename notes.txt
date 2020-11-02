@@ -51,3 +51,18 @@ hisat2-build <path to unzipped .fa with genome > index_name
 
 ## pull jellyfish docker for kmer processing
 docker pull biocontainers/jellyfish:v2.2.10-2-deb_cv1
+
+
+## jellyfish docker I just pulled did not have the ps, which what necessary for nextflow integration;
+## for that reason I made anew docker image basing on the biocontainers/jellyfish:v2.2.10-2-deb_cv1 with installed procps
+## root user was necessary, as well as adding the user permissions to the nextflow config file to deal with permissions
+
+
+## updating the createGenomicIndexes.nf to aslo create the jellyfish indexes for desired kmerFilterScript
+
+## need to add python 2.7 and possibly other dependencies to the jellyfish container in order to operate the kmer_filer python script, so jellyfish container needs to be rebuilt
+docker build -t jellyfish_ps:1.1 .
+
+## need to add also the biopython to have numpy installed; modified the dockerfile for jellyfish and built again
+docker build -t jellyfish_ps:1.2
+##now the kmer filter works well
