@@ -23,7 +23,7 @@ params.overlapMode = "no"
 
 // create channel with input genome index files for alignments
 hs2_indices = Channel.fromPath("$genomeBasePath/${params.genome_index}/${params.genome_index}.*.ht2*")
-
+hs2_indices_duplicate = Channel.fromPath("$genomeBasePath/${params.genome_index}/${params.genome_index}.*.ht2*")
 
 process blockParse {
   container = 'testdocker3'
@@ -113,7 +113,6 @@ process initial_mapping {
 }
 
 
-
 process filteringEndo {
 
   container = 'testdocker3'
@@ -156,8 +155,6 @@ process filteringExo {
 	python ${outputCleanScript} -F ${params.F} -f ${params.name}_hisat2.sam -o ${params.name}_cleaned --zero
 	"""
 }
-
-
 
 
 process checkStrand {
@@ -240,7 +237,7 @@ process bed2fasta {
 	script:
 
 	"""
-  python ${bed2FastaScript} -f "${params.name}_structureCheck.bed" -o "_finalProbes"
+  python ${bed2FastaScript} -f "${params.name}_structureCheck.bed" -o "${params.name}_finalProbes"
 	"""
 }
 
@@ -282,8 +279,11 @@ process countFinalProbes {
 
 process mappingFinalProbes {
 
+  container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+
 	input:
   path "${params.name}_finalProbes.fastq" from finalFastqProcessMapping
+  path hs2_indices_duplicate from hs2_indices_duplicate.collect()
 
 	output:
   path "${params.name}_finalProbes.sam" into mappingFinalProcess
@@ -293,17 +293,19 @@ process mappingFinalProbes {
 
 	script:
 	"""
-	hisat2 -x /tungstenfs/scratch/gchao/OligoMiner/INDEXES/hisat2/hisat2_${params.genome} -U ${params.name}_finalProbes.fastq -S ${params.name}_finalProbes.sam
+	hisat2 -x ${params.genome_index} -U ${params.name}_finalProbes.fastq -S ${params.name}_finalProbes.sam
 	"""
 }
 
 process sam2bam {
 
+  container = 'samtools_ps:1.0'
+
 	input:
-  file "${params.name}_finalProbes.sam" from mappingFinalProcess
+  path "${params.name}_finalProbes.sam" from mappingFinalProcess
 
 	output:
-  file "${params.name}_finalProbes.bam" into finalBamProcess
+  path "${params.name}_finalProbes.bam" into finalBamProcess
 
 	script:
 	"""
@@ -314,11 +316,13 @@ process sam2bam {
 
 process sortBam {
 
+  container = 'samtools_ps:1.0'
+
 	input:
-  file "${params.name}_finalProbes.bam" from finalBamProcess
+  path "${params.name}_finalProbes.bam" from finalBamProcess
 
 	output:
-  file "${params.name}_finalProbes_sorted.bam" into alignment1ProcessSort, alignment1ProcessZip
+  path "${params.name}_finalProbes_sorted.bam" into alignment1ProcessSort, alignment1ProcessZip
 
 
 	script:
@@ -330,11 +334,13 @@ process sortBam {
 
 process sortIndexBam {
 
+  container = 'samtools_ps:1.0'
+
 	input:
-  file "${params.name}_finalProbes_sorted.bam" from alignment1ProcessSort
+  path "${params.name}_finalProbes_sorted.bam" from alignment1ProcessSort
 
 	output:
-  file "${params.name}_finalProbes_sorted.bam.bai" into alignment2Process
+  path "${params.name}_finalProbes_sorted.bam.bai" into alignment2Process
 
 	script:
 	"""
@@ -346,11 +352,13 @@ process sortIndexBam {
 
 process revComplement {
 
+  container = 'biocontainers/fastxtools:v0.0.14_cv2'
+
   input:
-  file "${params.name}_finalProbes.fasta" from bed2fastaProcessRevCompl
+  path "${params.name}_finalProbes.fasta" from bed2fastaProcessRevCompl
 
   output:
-  file "${params.name}_finalProbes_revComplement.fasta" into revComplEndo, revComplExo
+  path "${params.name}_finalProbes_revComplement.fasta" into revComplEndo, revComplExo
 
   script:
   """
@@ -360,16 +368,19 @@ process revComplement {
 
 process probeTm {
 
+  container = 'testdocker3'
+
   input:
-  file "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
+  path "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
+  path probeTmScript from "$projectDir/OligoMiner-master/probeTm.py"
 
   output:
-  file "${params.name}_finalProbes_Tm.txt" into probeTmEndo, probeTmExo
+  path "${params.name}_finalProbes_Tm.txt" into probeTmEndo, probeTmExo
 
   script:
   """
   awk 'BEGIN{RS=">"}{print "#"\$1"\t"\$2;}' ${params.name}_finalProbes.fasta | tail -n+2 > ${params.name}_finalProbes.txt
-  /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/probeTm_toFuturize.py -f ${params.name}_finalProbes.txt -F ${params.F} -o ${params.name}_finalProbes_Tm
+  python ${probeTmScript} -f ${params.name}_finalProbes.txt -F ${params.F} -o ${params.name}_finalProbes_Tm
   """
 }
 
@@ -383,7 +394,7 @@ process makeLog {
 
   output:
   stdout result into makeLogProcessPrint
-  file "${params.name}_log.txt" into makeLogProcessEndo, makeLogProcessExo
+  path "${params.name}_log.txt" into makeLogProcessEndo, makeLogProcessExo
 
 
   script:
@@ -397,7 +408,7 @@ process makeLog {
   echo -e "Date of run: \$run_date \n" >> ${params.name}_log.txt
   echo -e "\nParameters of the run:\n" >> "${params.name}_log.txt"
   echo -e "Type of sequence (endogenous / exogenous): ${params.mode}\n" >> ${params.name}_log.txt
-  echo -e "Target organism genome: ${params.genome}\n"  >> ${params.name}_log.txt
+  echo -e "Target organism genome: ${params.genome_index}\n"  >> ${params.name}_log.txt
   echo -e "Min probe length, nt: ${params.l}\n"  >> ${params.name}_log.txt
   echo -e "Max probe length, nt: ${params.L}\n"  >> ${params.name}_log.txt
   echo -e "Probes spacing, nt: ${params.spacing}\n"  >> ${params.name}_log.txt
@@ -417,19 +428,20 @@ process makeLog {
 
 process alignExo{
 
+  container = 'biocontainers/emboss:v6.6.0dfsg-7b1-deb_cv1'
 
   input:
-  file "${params.name}_finalProbes.fasta" from bed2fastaProcessExoAlign
+  path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoAlign
 
   output:
-  file "${params.name}_alignment.doc" into alignExoProcess
+  path "${params.name}_alignment.doc" into alignExoProcess
 
   when:
   params.mode == "exo"
 
   script:
   """
-  needle ${inFilePath} ${params.name}_finalProbes.fasta -sreverse2 -outfile ${params.name}_alignment.doc -gapopen 10 -gapextend 10
+  needle ${params.name}_finalProbes.fasta -sreverse2 -outfile ${params.name}_alignment.doc -gapopen 10 -gapextend 10
   """
 
 }
@@ -437,18 +449,21 @@ process alignExo{
 process zipOutFilesEndo {
 
   input:
-  file "${params.name}_finalProbes_sorted.bam" from alignment1ProcessZip
-  file "${params.name}_finalProbes_sorted.bam.bai" from alignment2Process
-  file "${params.name}_finalProbes.fasta" from bed2fastaProcessEndoZip
-  file "${params.name}_finalProbes_revComplement.fasta" from revComplEndo
-  file "${params.name}_finalProbes_Tm.txt" from probeTmEndo
+  path "${params.name}_finalProbes_sorted.bam" from alignment1ProcessZip
+  path "${params.name}_finalProbes_sorted.bam.bai" from alignment2Process
+  path "${params.name}_finalProbes.fasta" from bed2fastaProcessEndoZip
+  path "${params.name}_finalProbes_revComplement.fasta" from revComplEndo
+  path "${params.name}_finalProbes_Tm.txt" from probeTmEndo
 
-  file "${params.name}_log.txt" from makeLogProcessEndo
+  path "${params.name}_log.txt" from makeLogProcessEndo
+
+  when:
+  params.mode == "endo"
 
   script:
   """
   zip ${params.outputName}.zip ${params.name}_finalProbes_sorted.bam ${params.name}_finalProbes_sorted.bam.bai ${params.name}_finalProbes.fasta ${params.name}_finalProbes_revComplement.fasta ${params.name}_finalProbes_Tm.txt ${params.name}_log.txt
-  cp ./${params.outputName}.zip /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/RESULTS_FOLDER/
+  cp ./${params.outputName}.zip ${projectDir}/Results/
   """
 }
 
@@ -456,11 +471,11 @@ process zipOutFilesEndo {
 
 process zipOutFilesExo {
   input:
-  file "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip
-  file "${params.name}_alignment.doc" from alignExoProcess
-  file "${params.name}_finalProbes_revComplement.fasta" from revComplExo
-  file "${params.name}_finalProbes_Tm.txt" from probeTmExo
-  file "${params.name}_log.txt" from makeLogProcessExo
+  path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip
+  path "${params.name}_alignment.doc" from alignExoProcess
+  path "${params.name}_finalProbes_revComplement.fasta" from revComplExo
+  path "${params.name}_finalProbes_Tm.txt" from probeTmExo
+  path "${params.name}_log.txt" from makeLogProcessExo
 
   when:
   params.mode == "exo"
@@ -468,7 +483,7 @@ process zipOutFilesExo {
   script:
   """
   zip ${params.outputName}.zip ${params.name}_finalProbes.fasta ${params.name}_alignment.doc ${params.name}_finalProbes_revComplement.fasta ${params.name}_finalProbes_Tm.txt ${params.name}_log.txt
-  cp ./${params.outputName}.zip /tungstenfs/scratch/gchao/OligoMiner/djangoProbeDesigner/ProbeDesigner/ProbeDesigner/scripts/RESULTS_FOLDER/
+  cp ./${params.outputName}.zip ${projectDir}/Results/
 
   """
 }

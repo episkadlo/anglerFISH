@@ -14,10 +14,10 @@ def main():
             df = pandas.read_csv(str(file), sep = '\t', header = None)
             df.columns= ['chr', 'pos1', 'pos2', 'seq', 'Tm']
             probe_inx = []
-            for i in range (1, len(df)+1): probe_inx.append('>probe_' + str(i) + " " + str(file).split(".")[0])
+            for i in range (1, len(df)+1): probe_inx.append('>probe_' + str(i) + " " + str(out))
             new_inx = pandas.Series(probe_inx)
             out_df = pandas.concat([new_inx, df['seq']], axis = 1, sort = False)
-            f= open(str(file).split(".")[0] + str(out) + '.fasta','w+')
+            f= open(str(out) + '.fasta','w+')
             for index, row in out_df.iterrows():
                 f.write(str(row[0])+"\n")
                 f.write(str(row['seq'])+"\n")
@@ -29,7 +29,7 @@ def main():
 
     # add ArgumentParser
     parser.add_argument("-f", "--File", required=True, help = "input bed file, from which the single sequences will be extracted and saved as a fasta file; reqired")
-    parser.add_argument("-o", "--out", default='_finalProbes', help = "optional output fasta file suffix; default: _finalProbes")
+    parser.add_argument("-o", "--out", required=True, help = "optional output fasta file name; required")
     args = parser.parse_args()
     inFile = args.File
     outSuffix = args.out

@@ -66,3 +66,6 @@ docker build -t jellyfish_ps:1.1 .
 ## need to add also the biopython to have numpy installed; modified the dockerfile for jellyfish and built again
 docker build -t jellyfish_ps:1.2
 ##now the kmer filter works well
+
+
+##must add pandas, samtools and fastx to the env!
