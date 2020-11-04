@@ -4,7 +4,8 @@ work/
 # entire genomes and indexes folder
 genomes/
 
-# UP
+# results from the runs
+Results/
 
 # Logs
 
