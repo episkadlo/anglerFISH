@@ -1,30 +1,139 @@
 #!/usr/bin/env nextflow
 
+/*
+======================================================
+              RNA FISH probes designer
+======================================================
+simple pipeline to design highly specific and
+customizable RNA FISH probes
+------------------------------------------------------
+*/
+
+//collect and configure input parameters
 params.name = ""
 params.outputName = "${params.name}_output"
-inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
+params.inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
 params.l = 45
-params.L = params.l
+params.L = 50
 params.spacing = 2
 params.F = 50
 params.s = 390
 params.g = 20
 params.G = 80
-params.t = 37
-params.T = 50
+params.t = 47
+params.T = 60
 params.hybrTemp = 37
 params.genome_index = ''
-genomeBasePath = "$projectDir/genomes/indexes"
-genomeIndexPath = "$genomeBasePath/${params.genome_index}"
-params.m = params.l
+params.genomeIndexPath = "$projectDir/genomes/indexes/"
 params.mode = "endo"
 params.strand = "-"
 params.overlapMode = "no"
 params.createIndexes = false
 params.rawGenomePath = "$projectDir/genomes/raw/${params.genome_index}.fa"
 params.jf_only = false
+params.help = ""
 
 
+// help message text
+
+def helpMessage() {
+  log.info """
+
+
+
+  =========================================================================================================================
+                                                  RNA FISH probes designer
+  =========================================================================================================================
+                  simple nextflow pipeline to design highly specific and customizable RNA FISH probes
+  -------------------------------------------------------------------------------------------------------------------------
+
+  Usage:
+
+  Example run command:
+    To design RNA FISH probes against sequence in example.fa of length 45-50 nucleotides, working in 50% formamide solution
+    with check against specificity in mm10 genome:
+
+    nextflow run main.nf --name 'example.fa' --genome_index mm10 --mode exo --l 45 --L 50 --F 50
+
+
+
+  Manditory arguments:
+      --name                    name of the input .fa file for which the probes are to be designer; if the file is not
+                                located in the default UPLOAD_FASTA_HERE folder, specify the path via --inFIlePath instead
+
+      --genome_index            the name of the genome and it's indexes against which the probes will be aligned against
+
+      --mode
+
+      --strand
+
+  General arguments:
+      --outputName              name of the output file; by default <name>_output
+
+      --inFilePath              path to the .fa file; by default <projectDir>/UPLOAD_FASTA_HERE/<name.fa>
+
+      --genomeIndexPath         path to directory where the indexes for the genome are located;
+                                by default <projectDir>/genomes/indexes/
+
+  Specyfing parameters of the probes:
+      --l                       minimal length of probe (nucleotides ), default: 45
+
+      --L                       maximal length of probe (nucleotides), default: 50
+
+      --spacing                 minimal allowed spacing between two probes; defualt: 2
+
+      --F                       formamide concentration of formamide in the buffers (%);
+                                default: 50
+
+      --s                       Na+ concentration in the buffers (mM), default: 390
+
+      --g                       minimal GC content in a probe (%), default: 20
+
+      --G                       maxinmal GC content in a probe (%), default: 80
+
+      --t                       minimal Tm (melting temperature) of a probe (degC),
+                                default: 47
+
+      --T                       minimal Tm (melting temperature) of a probe (degC),
+                                default: 60
+
+      --hybrTemp                hybridization temperature (degC), default: 37
+
+      --overlapMode             allow for overlaping probes (true/false), default: false
+
+    Creating genome indexes for HISAT2 and Jellyfish:
+      -- createIndexes          trigger creating the HISAT2 and Jellyfish indexes of name specified
+                                via --genome_index tag using the default path to the .fa file; the --genome_
+                                index must match the fasta file name with the intup genome sequence; by deafult,
+                                the createIndex will look for genome fasta file in <projectDir>/genomes/raw/,
+                                unless it is overridden by specifying path of the genomic fasta
+                                with --rawGenomePath tag; it will create Jellyfish dictionaries for lengths
+                                specified via --l and --L (maximum and minimum probe length); it will
+                                override existing the genome_index for HISAT2 and existing Jellyfish dictionaries;
+
+      -- jf_only                only create Jellyfish indexes for given --l and --L (maximum and minimum
+                                probe length) and use existing HISAT2 indexes; useful if --createIndex was
+                                used before, and the lengths of designed probes is now changing and the
+                                Jellyfish indexes must be expanded to cover extra probe lengths
+      -- rawGenomePath          specify path of the fasta file with genomic sequence, which will be used for
+                                creating HISAT2 and/or Jellyfish dictionaries, used with --createIndex flag;
+                                default: <projectDir>/genomes/raw/<genome_index>
+
+
+  """.stripIndent()
+
+}
+
+
+// show help message when --help frag is called
+if (params.help) {
+  helpMessage()
+  exit 0
+}
+
+
+// create HISAT2 index of genome using genome_index name matching the fasta file with genomic
+// sequence, and optionally the path to the fasta file if not in the default location
 process createHisat2index {
   container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
 
@@ -36,7 +145,7 @@ process createHisat2index {
     path "${params.genome_index}.*.ht2*" into hs2_indices_created, hs2_indices_created_duplicate
 
   when:
-    params.createIndexes == true & params.jf_only == false
+    params.createIndexes == true && params.jf_only == false
 
   script:
 
@@ -47,18 +156,18 @@ process createHisat2index {
       """
 }
 
-
+//if the HISAT2 index of the genome index exists, collect the index files and create the channel for aignment
 process collectHisat2index {
 
   input:
-    path hisat2index from Channel.fromPath("$projectDir/genomes/indexes/${params.genome_index}/*.ht2").collect()
+    path hisat2index from Channel.fromPath("${params.genomeIndexPath}/${params.genome_index}/*.ht2").collect()
 
   output:
     val 'done' into hiast2IndexProcess_collected
     path hisat2index into hs2_indices_collected, hs2_indices_collected_duplicate
 
   when:
-    params.createIndexes == false || params.jf_only == true
+    params.createIndexes == false || (params.createIndexes == true && params.jf_only == true)
 
   script:
 
@@ -67,7 +176,8 @@ process collectHisat2index {
       """
 }
 
-
+// create Jellyfish index/dictionary of genome using genome_index name matching the fasta file with genomic
+// sequence, and optionally the path to the fasta file if not in the default location
 process createJellyfishIndex {
   container = 'jellyfish_ps:1.2'
 
@@ -90,11 +200,12 @@ process createJellyfishIndex {
       """
 }
 
-
+//if the Jellyfish index/dictionary of the genome index exists for given length, collect the index files and create the channel for aignment
 process collectJellyfishindex {
 
   input:
-    path jellyfishIndex from Channel.fromPath("$projectDir/genomes/indexes/${params.genome_index}/*.jf").collect()
+
+    path jellyfishIndex from Channel.fromPath("${params.genomeIndexPath}/${params.genome_index}/*.jf").collect()
 
   output:
     val 'done' into jellyfishIndexProcess_collected
@@ -111,7 +222,7 @@ process collectJellyfishindex {
 }
 
 
-
+// call OligoMiner's script blockParse to create list of candidate probes with given parameters
 process blockParse {
   container = 'testdocker3'
 
@@ -119,7 +230,7 @@ process blockParse {
   val hisat2indexDone from hiast2IndexProcess_created.mix(hiast2IndexProcess_collected)
   val jellyfishIndexDone from jellyfishIndexProcess_created.mix(jellyfishIndexProcess_collected)
   path blockParseScript from "$projectDir/OligoMiner-master/blockParse.py"
-  path inFile from inFilePath
+  path inFile from "${params.inFilePath}"
 
   output:
   path "${params.name}_blockparse.fastq" into blockparseProcess, blockparseProcess_count
@@ -165,7 +276,7 @@ process blockParse {
 
 }
 
-
+// count the number of probes before filtering for reporting
 process countInitialProbes {
 
   input:
@@ -181,7 +292,7 @@ process countInitialProbes {
 	"""
 }
 
-
+//use HISAT2 to align the candidate probes to genome specified in genome_index
 process initial_mapping {
 
   container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
@@ -200,7 +311,8 @@ process initial_mapping {
 	"""
 }
 
-
+// filter out unspecific cprobes using Oligominer's outputClean script for endogenous
+// sequence, keeping only the probes that align exacly once (flag -u)
 process filteringEndo {
 
   container = 'testdocker3'
@@ -222,7 +334,8 @@ process filteringEndo {
 	"""
 }
 
-
+// filter out unspecific cprobes using Oligominer's outputClean script for ezogenous
+// sequence, keeping only the probes that do not align to the genome(flag --zero)
 process filteringExo {
 
   container = 'testdocker3'
@@ -244,7 +357,8 @@ process filteringExo {
 	"""
 }
 
-
+//check the standedness of the sequence, reverse-transcribe probes using OligoMiner's probeRC scripts
+// if the original fasta sequence is on + strand for endogenous or if it is an exogenous sequences
 process checkStrand {
 
   container = 'testdocker3'
@@ -270,7 +384,7 @@ process checkStrand {
     """
 }
 
-
+// using OligoMiner's kmerFileter script to filter out common k-mers from probes (utilizing jellyfish)
 process kmerFilter {
 
   container = 'jellyfish_ps:1.2'
@@ -295,7 +409,7 @@ process kmerFilter {
 
 }
 
-
+// using OligoMiner's structureCheck script to filter out probable secondary structures-forming probes (utilizing NUPACK)
 process structureCheck {
 
   // container = 'python2-nupack:1.3'
@@ -315,7 +429,7 @@ process structureCheck {
 	"""
 }
 
-
+// get filtered probes in form of a fasta file
 process bed2fasta {
 
   conda '/home/ewa/anaconda3/envs/envForStructureCheck'
@@ -334,7 +448,7 @@ process bed2fasta {
 	"""
 }
 
-
+// get filtered probes in form of a fastq file for visualization purposes in endogenous sequences
 process bed2fastq {
 
   container = 'testdocker3'
@@ -353,7 +467,7 @@ process bed2fastq {
 	"""
 }
 
-
+// count the number of probes after all filtering steps
 process countFinalProbes {
 
 	input:
@@ -369,7 +483,7 @@ process countFinalProbes {
 	"""
 }
 
-
+// map the filtered probes to the genome with HISAT2 (for later visualization purposes, endogenous sequences only)
 process mappingFinalProbes {
 
   container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
@@ -390,6 +504,7 @@ process mappingFinalProbes {
 	"""
 }
 
+// convert the sam file to bam, using samtools
 process sam2bam {
 
   container = 'samtools_ps:1.0'
@@ -406,7 +521,7 @@ process sam2bam {
 	"""
 }
 
-
+// sort the bam file, using samtools
 process sortBam {
 
   container = 'samtools_ps:1.0'
@@ -424,7 +539,7 @@ process sortBam {
 	"""
 }
 
-
+// index the bam file, using samtools
 process sortIndexBam {
 
   container = 'samtools_ps:1.0'
@@ -442,7 +557,7 @@ process sortIndexBam {
 }
 
 
-
+// create a fasta with reverse complementary sequences to the filtered probes using fastx
 process revComplement {
 
   container = 'biocontainers/fastxtools:v0.0.14_cv2'
@@ -459,6 +574,7 @@ process revComplement {
   """
 }
 
+//estimate the melting temperatures of the filtered probes using OligoMiner's probeTm script
 process probeTm {
 
   container = 'testdocker3'
@@ -477,7 +593,7 @@ process probeTm {
   """
 }
 
-
+// create a log file holding key informations from the parameters used in the rnn
 process makeLog {
 
   input:
@@ -518,7 +634,7 @@ process makeLog {
 }
 
 
-
+// create local alignment between filtered probes and the input sequence, using needle from EMBOSS
 process alignExo{
 
   container = 'biocontainers/emboss:v6.6.0dfsg-7b1-deb_cv1'
@@ -539,6 +655,7 @@ process alignExo{
 
 }
 
+// create and zip file containign all the output file, for endogenous sequeence
 process zipOutFilesEndo {
 
   input:
@@ -561,7 +678,7 @@ process zipOutFilesEndo {
 }
 
 
-
+// create and zip file containign all the output file, for exogenous sequeence
 process zipOutFilesExo {
   input:
   path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip
