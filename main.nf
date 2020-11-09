@@ -13,10 +13,10 @@ customizable RNA FISH probes
 params.name = ""
 params.outputName = "${params.name}_output"
 params.inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
-params.l = 45
-params.L = 50
+params.l = 18
+params.L = 23
 params.spacing = 2
-params.F = 50
+params.F = 10
 params.s = 390
 params.g = 20
 params.G = 80
@@ -75,14 +75,14 @@ def helpMessage() {
                                 by default <projectDir>/genomes/indexes/
 
   Specyfing parameters of the probes:
-      --l                       minimal length of probe (nucleotides ), default: 45
+      --l                       minimal length of probe (nucleotides ), default: 18
 
-      --L                       maximal length of probe (nucleotides), default: 50
+      --L                       maximal length of probe (nucleotides), default: 23
 
       --spacing                 minimal allowed spacing between two probes; defualt: 2
 
       --F                       formamide concentration of formamide in the buffers (%);
-                                default: 50
+                                default: 10
 
       --s                       Na+ concentration in the buffers (mM), default: 390
 
@@ -140,10 +140,6 @@ process createHisat2index {
   input:
     path rawGenomePath from "$params.rawGenomePath"
 
-  output:
-    val 'done' into hiast2IndexProcess_created
-    path "${params.genome_index}.*.ht2*" into hs2_indices_created, hs2_indices_created_duplicate
-
   when:
     params.createIndexes == true && params.jf_only == false
 
@@ -166,7 +162,9 @@ process collectHisat2index {
     path hisat2index into hs2_indices_collected, hs2_indices_collected_duplicate
 
   when:
-    params.createIndexes == false || (params.createIndexes == true && params.jf_only == true)
+    params.createIndexes == false
+    // params.createIndexes == false || (params.createIndexes == true && params.jf_only == true)
+
 
   script:
     """
@@ -183,10 +181,6 @@ process createJellyfishIndex {
   input:
     path rawGenomePath from "$params.rawGenomePath"
     path buildJellyfishIndexes from "$projectDir/helperScripts/buildJellyfishIndexes.sh"
-
-  output:
-    val 'done' into jellyfishIndexProcess_created
-    path "*.jf" into jellyfish_indices_created, jellyfish_indices_created_duplicate
 
   when:
     params.createIndexes == true
@@ -224,8 +218,8 @@ process blockParse {
   container = 'testdocker3'
 
   input:
-    val hisat2indexDone from hiast2IndexProcess_created.mix(hiast2IndexProcess_collected)
-    val jellyfishIndexDone from jellyfishIndexProcess_created.mix(jellyfishIndexProcess_collected)
+    val hisat2indexDone from hiast2IndexProcess_collected
+    val jellyfishIndexDone from jellyfishIndexProcess_collected
     path blockParseScript from "$projectDir/OligoMiner-master/blockParse.py"
     path inFile from "${params.inFilePath}"
 
@@ -296,7 +290,7 @@ process initial_mapping {
 
 	input:
     path "${params.name}_blockparse.fastq" from blockparseProcess
-    path hs2_indices from hs2_indices_created.mix(hs2_indices_collected) .collect()
+    path hs2_indices from hs2_indices_collected.collect()
 
 
 	output:
@@ -385,7 +379,7 @@ process kmerFilter {
 	input:
     path "${params.name}_strandChecked.bed" from checkStrandProcess
     path kmerFilterScript from "$projectDir/OligoMiner-master/kmerFilter.py"
-    path jfDict from jellyfish_indices_created.mix(jellyfish_indices_collected) .collect()
+    path jfDict from jellyfish_indices_collected.collect()
 
 	output:
     path "${params.name}_kmerFilter.bed" into kmerFilterProcess
@@ -477,7 +471,7 @@ process mappingFinalProbes {
 
 	input:
     path "${params.name}_finalProbes.fastq" from finalFastqProcessMapping
-    path hs2_indices_duplicate from hs2_indices_created_duplicate.mix(hs2_indices_collected_duplicate) .collect()
+    path hs2_indices_duplicate from hs2_indices_collected_duplicate.collect()
 
 	output:
     path "${params.name}_finalProbes.sam" into mappingFinalProcess
