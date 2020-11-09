@@ -62,11 +62,12 @@ def helpMessage() {
 
       --genome_index            the name of the genome and it's indexes against which the probes will be aligned against
 
-      --mode
+      --mode                    accepted values: endo / exo; use endo when target sequence occurs naturally in the genome
+                                (i.e. probes against actin mRNA); use exo for targets that cannot be found in the genome
+                                (i. e. probes against GFP)
 
-      --strand
+      --strand                  strand of the target genome for the endogenous (endo) type of sequence
 
-  General arguments:
       --outputName              name of the output file; by default <name>_output
 
       --inFilePath              path to the .fa file; by default <projectDir>/UPLOAD_FASTA_HERE/<name.fa>
@@ -100,6 +101,7 @@ def helpMessage() {
 
       --overlapMode             allow for overlaping probes (true/false), default: false
 
+
     Creating genome indexes for HISAT2 and Jellyfish:
       -- createIndexes          trigger creating the HISAT2 and Jellyfish indexes of name specified
                                 via --genome_index tag using the default path to the .fa file; the --genome_
@@ -109,11 +111,14 @@ def helpMessage() {
                                 with --rawGenomePath tag; it will create Jellyfish dictionaries for lengths
                                 specified via --l and --L (maximum and minimum probe length); it will
                                 override existing the genome_index for HISAT2 and existing Jellyfish dictionaries;
+                                with this flag, only specifying --genome_index (or --rawGenomePath if not in default
+                                location) and minimal and maximal desired probes length (--l and --L) are required
 
       -- jf_only                only create Jellyfish indexes for given --l and --L (maximum and minimum
-                                probe length) and use existing HISAT2 indexes; useful if --createIndex was
-                                used before, and the lengths of designed probes is now changing and the
-                                Jellyfish indexes must be expanded to cover extra probe lengths
+                                probe length) and do NOT create HISAT2 idex; useful if --createIndex was
+                                used before to create HISAT2 index, and the lengths of designed probes is now changing
+                                and th Jellyfish indexes must be expanded to acommodate extra probe lengths
+
       -- rawGenomePath          specify path of the fasta file with genomic sequence, which will be used for
                                 creating HISAT2 and/or Jellyfish dictionaries, used with --createIndex flag;
                                 default: <projectDir>/genomes/raw/<genome_index>
