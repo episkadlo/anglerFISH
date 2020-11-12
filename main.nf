@@ -139,8 +139,8 @@ if (params.help) {
 // create HISAT2 index of genome using genome_index name matching the fasta file with genomic
 // sequence, and optionally the path to the fasta file if not in the default location
 process createHisat2index {
-
-  container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+  //container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python3'
 
   input:
     path rawGenomePath from "$params.rawGenomePath"
@@ -181,7 +181,9 @@ process collectHisat2index {
 // sequence, and optionally the path to the fasta file if not in the default location
 process createJellyfishIndex {
 
-  container = 'jellyfish_ps:1.2'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
   input:
     path rawGenomePath from "$params.rawGenomePath"
@@ -220,7 +222,10 @@ process collectJellyfishindex {
 // call OligoMiner's script blockParse to create list of candidate probes with given parameters
 process blockParse {
 
-  container = 'testdocker3'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
   input:
     val hisat2indexDone from hiast2IndexProcess_collected
@@ -275,6 +280,9 @@ process blockParse {
 // count the number of probes before filtering for reporting
 process countInitialProbes {
 
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'rna-fish-probe-maker:0.2'
+
   input:
     path "${params.name}_blockparse.fastq" from blockparseProcess_count
 
@@ -291,7 +299,10 @@ process countInitialProbes {
 //use HISAT2 to align the candidate probes to genome specified in genome_index
 process initial_mapping {
 
-  container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python3'
+
 
 	input:
     path "${params.name}_blockparse.fastq" from blockparseProcess
@@ -310,8 +321,11 @@ process initial_mapping {
 // filter out unspecific cprobes using Oligominer's outputClean script for endogenous
 // sequence, keeping only the probes that align exacly once (flag -u)
 process filteringEndo {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'testdocker3'
 
 	input:
     path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
@@ -332,8 +346,11 @@ process filteringEndo {
 // filter out unspecific cprobes using Oligominer's outputClean script for ezogenous
 // sequence, keeping only the probes that do not align to the genome(flag --zero)
 process filteringExo {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'testdocker3'
 
 	input:
     path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
@@ -354,8 +371,11 @@ process filteringExo {
 //check the standedness of the sequence, reverse-transcribe probes using OligoMiner's probeRC scripts
 // if the original fasta sequence is on + strand for endogenous or if it is an exogenous sequences
 process checkStrand {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'testdocker3'
 
   input:
     path "${params.name}_cleaned.bed" from outputCleanProcessEndo.mix(outputCleanProcessExo)
@@ -379,7 +399,11 @@ process checkStrand {
 // using OligoMiner's kmerFileter script to filter out common k-mers from probes (utilizing jellyfish)
 process kmerFilter {
 
-  container = 'jellyfish_ps:1.2'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'jellyfish_ps:1.2'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
+
 
 	input:
     path "${params.name}_strandChecked.bed" from checkStrandProcess
@@ -401,8 +425,13 @@ process kmerFilter {
 // using OligoMiner's structureCheck script to filter out probable secondary structures-forming probes (utilizing NUPACK)
 process structureCheck {
 
-  // container = 'python2-nupack:1.3'
-  conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+  //conda '/home/ewa/anaconda3/envs/ProbeMakerDocker'
+  //container = 'python2-nupack:1.3'
+  // conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+  //container = 'oligominer-docker:0.1'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
+
 
 	input:
     path "${params.name}_kmerFilter.bed" from kmerFilterProcess
@@ -420,7 +449,9 @@ process structureCheck {
 // get filtered probes in form of a fasta file
 process bed2fasta {
 
-  conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //conda '/home/ewa/anaconda3/envs/envForStructureCheck'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
 	input:
     path "${params.name}_structureCheck.bed" from structureCheckProcessFasta
@@ -438,7 +469,9 @@ process bed2fasta {
 // get filtered probes in form of a fastq file for visualization purposes in endogenous sequences
 process bed2fastq {
 
-  container = 'testdocker3'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
 	input:
     path "${params.name}_structureCheck.bed" from structureCheckProcessFastq
@@ -456,6 +489,9 @@ process bed2fastq {
 // count the number of probes after all filtering steps
 process countFinalProbes {
 
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'rna-fish-probe-maker:0.2'
+
 	input:
     path "${params.name}_finalProbes.fastq" from finalFastqProcessCount
 
@@ -471,8 +507,10 @@ process countFinalProbes {
 
 // map the filtered probes to the genome with HISAT2 (for later visualization purposes, endogenous sequences only)
 process mappingFinalProbes {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+   //container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
+   conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python3'
 
-  container = 'quay.io/biocontainers/hisat2:2.2.0--py36hf0b53f7_4'
 
 	input:
     path "${params.name}_finalProbes.fastq" from finalFastqProcessMapping
@@ -493,7 +531,11 @@ process mappingFinalProbes {
 // convert the sam file to bam, using samtools
 process sam2bam {
 
-  container = 'samtools_ps:1.0'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'samtools_ps:1.0'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
+
 
 	input:
     path "${params.name}_finalProbes.sam" from mappingFinalProcess
@@ -509,8 +551,11 @@ process sam2bam {
 
 // sort the bam file, using samtools
 process sortBam {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'samtools_ps:1.0'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'samtools_ps:1.0'
 
 	input:
     path "${params.name}_finalProbes.bam" from finalBamProcess
@@ -526,8 +571,11 @@ process sortBam {
 
 // index the bam file, using samtools
 process sortIndexBam {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'samtools_ps:1.0'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'samtools_ps:1.0'
 
 	input:
     path "${params.name}_finalProbes_sorted.bam" from alignment1ProcessSort
@@ -544,7 +592,11 @@ process sortIndexBam {
 // create a fasta with reverse complementary sequences to the filtered probes using fastx
 process revComplement {
 
-  container = 'biocontainers/fastxtools:v0.0.14_cv2'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'biocontainers/fastxtools:v0.0.14_cv2'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
+
 
   input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessRevCompl
@@ -560,8 +612,11 @@ process revComplement {
 
 //estimate the melting temperatures of the filtered probes using OligoMiner's probeTm script
 process probeTm {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'testdocker3'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
 
-  container = 'testdocker3'
 
   input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
@@ -579,6 +634,8 @@ process probeTm {
 
 // create a log file holding key informations from the parameters used in the rnn
 process makeLog {
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'rna-fish-probe-maker:0.2'
 
   input:
     val initNprobes from InitialNprobesProcess
@@ -616,10 +673,16 @@ process makeLog {
 // create local alignment between filtered probes and the input sequence, using needle from EMBOSS
 process alignExo{
 
-  container = 'biocontainers/emboss:v6.6.0dfsg-7b1-deb_cv1'
+  //conda '/home/ewa/anaconda3/envs/ProbeMaker'
+  //container = 'biocontainers/emboss:v6.6.0dfsg-7b1-deb_cv1'
+  //container = 'rna-fish-probe-maker:0.2'
+  conda '/home/ewa/anaconda3/envs/ProbeMakerEnv_python2'
+
 
   input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoAlign
+    path inFile from "${params.inFilePath}"
+
 
   output:
     path "${params.name}_alignment.doc" into alignExoProcess
@@ -629,12 +692,18 @@ process alignExo{
 
   script:
     """
-    needle ${params.name}_finalProbes.fasta -sreverse2 -outfile ${params.name}_alignment.doc -gapopen 10 -gapextend 10
+    needle ${inFile} ${params.name}_finalProbes.fasta  -sreverse2 -outfile ${params.name}_alignment.doc -gapopen 10 -gapextend 10
     """
 }
 
 // create and zip file containign all the output file, for endogenous sequeence
 process zipOutFilesEndo {
+
+  //container = 'rna-fish-probe-maker:0.2'
+  publishDir "${projectDir}/Results/"
+
+  output:
+    path "./${params.outputName}.zip" into zip_endo
 
   input:
     path "${params.name}_finalProbes_sorted.bam" from alignment1ProcessZip
@@ -650,13 +719,16 @@ process zipOutFilesEndo {
   script:
     """
     zip ${params.outputName}.zip ${params.name}_finalProbes_sorted.bam ${params.name}_finalProbes_sorted.bam.bai ${params.name}_finalProbes.fasta ${params.name}_finalProbes_revComplement.fasta ${params.name}_finalProbes_Tm.txt ${params.name}_log.txt
-    cp ./${params.outputName}.zip ${projectDir}/Results/
     """
 }
 
 
 // create and zip file containign all the output file, for exogenous sequeence
 process zipOutFilesExo {
+
+  //container = 'rna-fish-probe-maker:0.2'
+  publishDir "${projectDir}/Results/"
+
   input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip
     path "${params.name}_alignment.doc" from alignExoProcess
@@ -664,12 +736,14 @@ process zipOutFilesExo {
     path "${params.name}_finalProbes_Tm.txt" from probeTmExo
     path "${params.name}_log.txt" from makeLogProcessExo
 
+  output:
+    path "./${params.outputName}.zip" into zip_exo
+
   when:
     params.mode == "exo"
 
   script:
     """
     zip ${params.outputName}.zip ${params.name}_finalProbes.fasta ${params.name}_alignment.doc ${params.name}_finalProbes_revComplement.fasta ${params.name}_finalProbes_Tm.txt ${params.name}_log.txt
-    cp ./${params.outputName}.zip ${projectDir}/Results/
     """
 }
