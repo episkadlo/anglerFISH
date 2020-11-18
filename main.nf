@@ -66,7 +66,8 @@ def helpMessage() {
                                 (i.e. probes against actin mRNA); use exo for targets that cannot be found in the genome
                                 (i. e. probes against GFP)
 
-      --strand                  strand of the target genome for the endogenous (endo) type of sequence
+      --strand                  strand of the target genome for the endogenous (endo) type of sequence; accepted values
+                                are - and + , default is -
 
       --outputName              name of the output file; by default <name>_output
 
@@ -114,10 +115,10 @@ def helpMessage() {
                                 with this flag, only specifying --genome_index (or --rawGenomePath if not in default
                                 location) and minimal and maximal desired probes length (--l and --L) are required
 
-      -- jf_only                only create Jellyfish indexes for given --l and --L (maximum and minimum
+      -- jf_only                only create Jellyfish indexes (dictionaries) for given --l and --L (maximum and minimum
                                 probe length) and do NOT create HISAT2 idex; useful if --createIndex was
                                 used before to create HISAT2 index, and the lengths of designed probes is now changing
-                                and th Jellyfish indexes must be expanded to acommodate extra probe lengths
+                                and the Jellyfish indexes must be expanded to acommodate extra probe lengths
 
       -- rawGenomePath          specify path of the fasta file with genomic sequence, which will be used for
                                 creating HISAT2 and/or Jellyfish dictionaries, used with --createIndex flag;
@@ -195,6 +196,7 @@ process createJellyfishIndex {
   script:
     """
     bash ${buildJellyfishIndexes} ${params.l} ${params.L} ${params.genome_index} ${rawGenomePath}
+    mkdir -p "${projectDir}/genomes/indexes/${params.genome_index}/"
     cp *.jf ${projectDir}/genomes/indexes/${params.genome_index}/
     """
 }
