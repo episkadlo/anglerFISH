@@ -1,3 +1,6 @@
+#gitingore itself
+.gitignore
+
 # Nextflow's work directory
 work/
 
@@ -24,3 +27,4 @@ tempStuff.nf
 tutorial.nf
 Nextflow_mini.nf
 notes.txt
+OLDnextflow.config
