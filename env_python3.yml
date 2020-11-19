@@ -1,0 +1,11 @@
+name: ProbeMakerEnv_python3
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - hisat2=2.2.1
+  - python=3.7
+
+
+
