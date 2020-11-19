@@ -38,6 +38,7 @@ Your directory structure should now look as follows:
 ```
 RNAFISHProbeDesigner-main
 |-- genomes
+|   |-- indexes
 |   `-- raw
 |-- helperScripts
 |   |-- buildJellyfishIndexes.sh
