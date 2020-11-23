@@ -10,9 +10,17 @@ It is based primarily on OligoMiner [2], as well as several common bioinformatic
 * Java &GreaterEqual; 8
 
 ## Installation and configuration
+0. Make sure you have Java &GreaterEqual; 8 installed:
+```
+java -version
+```
+If no java is found, install it with:
+```
+sudo apt install default-jdk
+```
 
-1. Install conda (Anaconda3 or Miniconda3).
-Check if conda is correctly installed with `conda info `
+1. Install conda Miniconda3 (or Anaconda3). Open and close the terminal.
+Check if conda is correctly installed with `conda info`
 
 2. Navigate to a directory where you wish your workflow to be created.
 Clone the RNA FISH probe designer repository from GitHub with git
@@ -28,9 +36,14 @@ git clone https://github.com/beliveau-lab/OligoMiner.git
 
 4. Inside the RNAFISHProbeDesigner-main directory, install Nextflow workflow manager:
 ```
+wget -qO- https://get.nextflow.io | bash
+```
+or
+```
 curl -fsSL get.nextflow.io | bash
 ```
-Your directory structure should now look as follows:
+An executable file nextflow will appear in the RNAFISHProbeDesigner-main directory.  
+Now, your directory structure should look as follows:
 ```
 RNAFISHProbeDesigner-main
 |-- genomes
@@ -39,25 +52,25 @@ RNAFISHProbeDesigner-main
 |-- helperScripts
 |   |-- buildJellyfishIndexes.sh
 |   `-- customBed2Fasta.py
-|-- env_python2.yml
-|-- env.python3.yml
+|-- OligoMiner-master
+|-- Results
+|-- UPLOAD_FASTA_HERE
+|-- ProbeMakerEnv_python2.yml
+|-- ProbeMakerEnv_python3.yml
 |-- main.nf
 |-- nextflow
 |-- nextflow.config
 |-- OligoMiner-master
 |-- README.md
-|-- Results
-|-- UPLOAD_FASTA_HERE
-```
-
+```  
 5. Inside the RNAFISHProbeDesigner-main directory, where the .yml files are, create two conda environments ProbeMakerEnv_python2 and ProbeMakerEnv_python3:
 ```
-conda env create -f env_python2.yml
-conda env create -f env_python3.yml
+conda env create -f ProbeMakerEnv_python2.yml
+conda env create -f ProbeMakerEnv_python3.yml
 ```
 Note the full paths of the conda environments you just created. You can check those by running:
 ```
-conda env lists
+conda env list
 ```
 6. Open the nextflow.config file in any text editor. In the indicated places fill in the local paths to conda environments you just created.
 
@@ -86,6 +99,8 @@ Place the \<genome>.fa into RNAFISHProbeDesigner-main/genomes/raw directory.
 ```
 ./nextflow main.nf --createIndexes --genome_index <genome name> --l <min length of probes> --L <max length of probes>
 ```
+Note: The order of the flags is irrelevant.
+
 The indexes will be automatically generated and placed in the RNAFISHProbeDesigner-main/genomes/indexes/<genome name> folder.
 
 3. (Optional) Adding extra indexes for Jellyfish with different k-mer lengths.  
@@ -102,6 +117,7 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
 ```
 ./nextflow main.nf --genome_index <genome name> --name <name of .fa sequence, without .fa> <probes parameters>  --outputName <basename of output files>
 ```
+Note: The order of the flags is irrelevant.
 Read about most important probe parameters you can specify in the `./nextflow. main.nf --help`
 Typically, you will want to specify: <default values>
 * **--l** minimal probe length (nucleotides) <18>
@@ -123,7 +139,7 @@ After a successful workflow execution, a zipped file will appear in RNAFISHProbe
 ### Examples
 In the repository we have included two RNA sequences (smc2_dm.fa, renilla.fa) which you can use to test your local workflow.
 
-First, download the Drosophila melanogaster dm6.fa.gz genome (size: 43M) from https\://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/. unpack it and place it in the  RNAFISHProbeDesigner-main/genomes/raw/ directory.
+First, download the Drosophila melanogaster dm6.fa.gz genome (size: 43M) from https\://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/. Unpack it and place it in the  RNAFISHProbeDesigner-main/genomes/raw/ directory.
 Prepare indexes for HISAT2 and Jellyfish (for probes 18-23nt-long):
 ```
 ./nextflow main.nf --genome_index dm6 --l 18 --L 23 --createIndexes
