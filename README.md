@@ -103,15 +103,15 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
 ./nextflow main.nf --genome_index <genome name> --name <name of .fa sequence, without .fa> <probes parameters>  --outputName <basename of output files>
 ```
 Read about most important probe parameters you can specify in the `./nextflow. main.nf --help`
-Typically, you will want to specify: [default values]
-* **--l** minimal probe length (nucleotides) [18]
-* **--L** maxinal probe length (nucleotides) [23]
-* **--spacing** minimal spacing between probes (nucleotides) [2]
-* **--t** minimal probe melting temperature (&deg;C) [47]
-* **--T** maximal probe melting temperature (&deg;C) [60]
-* **--F** formamide concentration in buffers (%) [10]
-* **--mode** type of sequence: endogenous or exogenous (endo/exo) [endo]
-* **--strand** strandness of the target RNA (-/+)(for endogenous only) [-]
+Typically, you will want to specify: <default values>
+* **--l** minimal probe length (nucleotides) <18>
+* **--L** maxinal probe length (nucleotides) <23>
+* **--spacing** minimal spacing between probes (nucleotides) <2>
+* **--t** minimal probe melting temperature (&deg;C) <47>
+* **--T** maximal probe melting temperature (&deg;C) <60>
+* **--F** formamide concentration in buffers (%) <10>
+* **--mode** type of sequence: endogenous or exogenous (endo/exo) <endo>
+* **--strand** strandness of the target RNA (-/+)(for endogenous only) <->
 
 After a successful workflow execution, a zipped file will appear in RNAFISHProbeDesigner-main/Results directory, containing the following output files:
 * .fa file with sequences of the probes that passed through all filters
@@ -121,9 +121,9 @@ After a successful workflow execution, a zipped file will appear in RNAFISHProbe
 * .txt log file with stored basic parameters of the run
 
 ### Examples
-In the repository we have included two RNA sequences (smc2_dm.fa, renilla.fa) which you can use to test your workflow.
+In the repository we have included two RNA sequences (smc2_dm.fa, renilla.fa) which you can use to test your local workflow.
 
-First, download the Drosophila melanogaster dm6.fa.gz genome (size: 43M), unpack it and place it in the  RNAFISHProbeDesigner-main/genomes/raw/ directory.
+First, download the Drosophila melanogaster dm6.fa.gz genome (size: 43M) from https\://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/. unpack it and place it in the  RNAFISHProbeDesigner-main/genomes/raw/ directory.
 Prepare indexes for HISAT2 and Jellyfish (for probes 18-23nt-long):
 ```
 ./nextflow main.nf --genome_index dm6 --l 18 --L 23 --createIndexes
@@ -140,13 +140,13 @@ After the run, unpack and check the log file. You should get 165 final probes (o
 ##### exogenous RNA target
 Design probes for an exogenous RNA coding renilla insterted into *D.melanogaster* cells. Sequence is stored in renilla.fa file. Probes are supposed to be 18-23nt-long. The output name should be renilla_test
 ```
-./nextflow main.nf --genome_index dm6 --name renilla --l 18 --L 23 --mode exo --strand exo --outputName renilla_test
+./nextflow main.nf --genome_index dm6 --name renilla --l 18 --L 23 --mode exo --outputName renilla_test
 ```
 After the run, unpack and check the log file. You should get 40 final probes (out of 44 probes before filtering).
 
 ### Visualization of endogenous alignments
-Go to the web application version of the Integrative Genomic Viewer at igv.org/app/ and click on the Genome > selector and select **the same genome version** that was used to filter and map your probes. You can also upload your own genome, if a non-standard genome was used.
-Then click on Tracks > Local File to load the probe alignment files created in by the pipeline. Select **both** .bam file and .bam.bai file at the same time. Search for the name of your gene in the input box next to the magnifying glass icon to zoom in to the gene and view the aligned probes.
+Go to the web application version of the Integrative Genomic Viewer at igv.org/app/ and click on the *Genome > selector* and select **the same genome version** that was used to filter and map your probes. You can also upload your own genome, if a non-standard genome was used.
+Then click on *Tracks > Local File* to load the probe alignment files created in by the pipeline. Select **both** .bam file and .bam.bai file at the same time. Search for the name of your gene in the input box next to the magnifying glass icon to zoom in to the gene and view the aligned probes.
 
 ## Scheme of the workflow
 The workflow utilizes the following tools to automatically design RNA FISH probes:  
