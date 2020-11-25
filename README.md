@@ -99,8 +99,7 @@ Place the \<genome>.fa into RNAFISHProbeDesigner-main/genomes/raw directory.
 ```
 ./nextflow main.nf --createIndexes --genome_index <genome name> --l <min length of probes> --L <max length of probes>
 ```
-Note: The order of the flags is irrelevant.
-
+Note: The order of the flags is irrelevant.   
 The indexes will be automatically generated and placed in the RNAFISHProbeDesigner-main/genomes/indexes/<genome name> folder.
 
 3. (Optional) Adding extra indexes for Jellyfish with different k-mer lengths.  
@@ -117,7 +116,7 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
 ```
 ./nextflow main.nf --genome_index <genome name> --name <name of .fa sequence, without .fa> <probes parameters>  --outputName <basename of output files>
 ```
-Note: The order of the flags is irrelevant.
+Note: The order of the flags is irrelevant.    
 Read about most important probe parameters you can specify in the `./nextflow. main.nf --help`
 Typically, you will want to specify: <default values>
 * **--l** minimal probe length (nucleotides) <18>
