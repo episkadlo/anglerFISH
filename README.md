@@ -172,8 +172,9 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 * NUPACK [5-7]
 * SAMtools [8]
 * FASTX-Toolkit [9]
-* EMBOSS/needle [10]
+* EMBOSS/needle [10]   
 
+![workflow_scheme](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_scheme.jpg)
 
 ## References
 [1]  P. Di Tommaso, M. Chatzou, E. W. Floden, P. P. Barja, E. Palumbo, and C. Notredame, “Nextflow enables reproducible computational workflows,” Nat. Biotechnol., vol. 35, no. 4, pp. 316–319, 2017.  
