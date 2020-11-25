@@ -1,0 +1,20 @@
+# Nextflow
+.nextflow.log*
+.nextflow/
+work/
+nextflow
+
+# Hidden / OS generated files
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+._*
+.vscode/
+Thumbs.db
+ehthumbs.db
+
+# Large files
+*.fa
+*.jf
+*.ht2
