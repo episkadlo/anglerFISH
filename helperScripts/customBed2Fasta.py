@@ -13,9 +13,9 @@ def bed_to_fasta(file, out):
     alone from the seq column and save it to a new fasta file.
     """
     df = pandas.read_csv(
-        str(file), sep="\t", header=None, columns=["chr", "pos1", "pos2", "seq", "Tm"]
+        str(file), sep="\t", header=None, names=["chr", "pos1", "pos2", "seq", "Tm"]
     )
-    probe_inx = [f">probe_{i}_{out}" for i in range(1, len(df) + 1)]
+    probe_inx = [">probe_%s_%s" % (str(i), str(out)) for i in range(1, len(df) + 1)]
 
     new_inx = pandas.Series(probe_inx)
     out_df = pandas.concat([new_inx, df["seq"]], axis=1, sort=False)
