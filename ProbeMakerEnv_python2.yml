@@ -14,5 +14,3 @@ dependencies:
   - pip=20.1.1
   - python=2.7
   - samtools=1.11
-
-
