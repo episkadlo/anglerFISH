@@ -4,6 +4,10 @@
 work/
 nextflow
 
+#OligoMiner files
+.OligoMiner
+.OligoMiner/*
+
 # Hidden / OS generated files
 .DS_Store
 .DS_Store?
