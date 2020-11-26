@@ -226,7 +226,7 @@ process blockParse {
     input:
     val hisat2indexDone from hiast2IndexProcess_collected
     val jellyfishIndexDone from jellyfishIndexProcess_collected
-    path blockParseScript from "$projectDir/OligoMiner-master/blockParse.py"
+    path blockParseScript from "$projectDir/OligoMiner/blockParse.py"
     path inFile from "${params.inFilePath}"
 
     output:
@@ -314,7 +314,7 @@ process initial_mapping {
 process filteringEndo {
 
     input:
-    path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
+    path outputCleanScript from "$projectDir/OligoMiner/outputClean.py"
     path "${params.name}_hisat2.sam" from initialMappingProcess_endo
 
     output:
@@ -338,7 +338,7 @@ process filteringEndo {
 process filteringExo {
 
     input:
-    path outputCleanScript from "$projectDir/OligoMiner-master/outputClean.py"
+    path outputCleanScript from "$projectDir/OligoMiner/outputClean.py"
     path "${params.name}_hisat2.sam" from initialMappingProcess_exo
 
     output:
@@ -363,7 +363,7 @@ process checkStrand {
 
   input:
     path "${params.name}_cleaned.bed" from outputCleanProcessEndo.mix(outputCleanProcessExo)
-    path probeRCScript from "$projectDir/OligoMiner-master/probeRC.py"
+    path probeRCScript from "$projectDir/OligoMiner/probeRC.py"
 
   output:
     path "${params.name}_strandChecked.bed" into checkStrandProcess
@@ -387,7 +387,7 @@ process kmerFilter {
 
     input:
     path "${params.name}_strandChecked.bed" from checkStrandProcess
-    path kmerFilterScript from "$projectDir/OligoMiner-master/kmerFilter.py"
+    path kmerFilterScript from "$projectDir/OligoMiner/kmerFilter.py"
     path jfDict from jellyfish_indices_collected.collect()
 
     output:
@@ -412,7 +412,7 @@ process structureCheck {
 
     input:
     path "${params.name}_kmerFilter.bed" from kmerFilterProcess
-    path structureCheckScript from "$projectDir/OligoMiner-master/structureCheck.py"
+    path structureCheckScript from "$projectDir/OligoMiner/structureCheck.py"
 
     output:
     path "${params.name}_structureCheck.bed" into structureCheckProcessFastq, structureCheckProcessFasta
@@ -451,7 +451,7 @@ process bed2fastq {
 
     input:
     path "${params.name}_structureCheck.bed" from structureCheckProcessFastq
-    path bedToFastqScript from "$projectDir/OligoMiner-master/bedToFastq.py"
+    path bedToFastqScript from "$projectDir/OligoMiner/bedToFastq.py"
 
     output:
     path "${params.name}_finalProbes.fastq" into finalFastqProcessMapping, finalFastqProcessCount
@@ -569,7 +569,7 @@ process probeTm {
 
     input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
-    path probeTmScript from "$projectDir/OligoMiner-master/probeTm.py"
+    path probeTmScript from "$projectDir/OligoMiner/probeTm.py"
 
     output:
     path "${params.name}_finalProbes_Tm.txt" into probeTmEndo, probeTmExo
