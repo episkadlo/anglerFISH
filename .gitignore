@@ -15,6 +15,7 @@ Thumbs.db
 ehthumbs.db
 
 # Large files
+*.zip
 *.fa
 *.jf
 *.ht2
