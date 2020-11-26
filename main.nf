@@ -82,7 +82,7 @@ def helpMessage() {
                                 (i. e. probes against GFP)
 
       --strand                  strand of the target genome for the endogenous (endo) type of sequence; accepted values
-                                are - and + , default is -
+                                are ["-", "+", "minus", "plus"], default: "-"
 
       --outputName              name of the output file; by default <name>_output
 
@@ -369,9 +369,11 @@ process checkStrand {
     path "${params.name}_strandChecked.bed" into checkStrandProcess
 
   script:
-    if ((params.strand == "+" & params.mode == "endo") || params.mode == "exo")
+    if (((params.strand == "+" || params.strand == "plus") & params.mode == "endo") || params.mode == "exo")
       """
-      python ${probeRCScript} -f ${params.name}_cleaned.bed -o ${params.name}_strandChecked
+      python ${probeRCScript}\
+        -f ${params.name}_cleaned.bed\
+        -o ${params.name}_strandChecked
       """
 
     else
