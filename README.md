@@ -227,15 +227,15 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 
 
 ## References
-[1]  P. Di Tommaso, M. Chatzou, E. W. Floden, P. P. Barja, E. Palumbo, and C. Notredame, “Nextflow enables reproducible computational workflows,” Nat. Biotechnol., vol. 35, no. 4, pp. 316–319, 2017.
-[2]  B. J. Beliveau et al., “OligoMiner provides a rapid, flexible environment for the design of genome-scale oligonucleotide in situ hybridization probes,” Proc. Natl. Acad. Sci. U. S. A., vol. 115, no. 10, pp. E2183–E2192, Mar. 2018.
-[3]  D. Kim, B. Langmead, and S. L. Salzberg, “HISAT: a fast spliced aligner with low memory requirements,” Nat. Methods, vol. 12, no. 4, pp. 357–360, 2015.
-[4]  G. Marçais and C. Kingsford, “A fast, lock-free approach for efficient parallel counting of occurrences of k-mers.,” Bioinformatics, vol. 27, no. 6, pp. 764–770, Mar. 2011.
-[5]  R. M. Dirks and N. A. Pierce, “A partition function algorithm for nucleic acid secondary structure including pseudoknots.,” J. Comput. Chem., vol. 24, no. 13, pp. 1664–1677, Oct. 2003.
-[6]  R. M. Dirks and N. A. Pierce, “An algorithm for computing nucleic acid base-pairing probabilities including pseudoknots.,” J. Comput. Chem., vol. 25, no. 10, pp. 1295–1304, Jul. 2004.
-[7]  R. M. Dirks, J. S. Bois, J. M. Schaeffer, E. Winfree, and N. A. Pierce, “Thermodynamic Analysis of Interacting Nucleic Acid Strands,” SIAM Rev., vol. 49, no. 1, pp. 65–88, Jan. 2007.
-[8]  H. Li et al., “The Sequence Alignment/Map format and SAMtools.,” Bioinformatics, vol. 25, no. 16, pp. 2078–2079, Aug. 2009.
-[9] Hannon, G.J. (2010) FASTX-Toolkit. http:\//hannonlab.cshl.edu fastx_toolkit
+[1]  P. Di Tommaso, M. Chatzou, E. W. Floden, P. P. Barja, E. Palumbo, and C. Notredame, “Nextflow enables reproducible computational workflows,” Nat. Biotechnol., vol. 35, no. 4, pp. 316–319, 2017.<br>
+[2]  B. J. Beliveau et al., “OligoMiner provides a rapid, flexible environment for the design of genome-scale oligonucleotide in situ hybridization probes,” Proc. Natl. Acad. Sci. U. S. A., vol. 115, no. 10, pp. E2183–E2192, Mar. 2018.<br>
+[3]  D. Kim, B. Langmead, and S. L. Salzberg, “HISAT: a fast spliced aligner with low memory requirements,” Nat. Methods, vol. 12, no. 4, pp. 357–360, 2015.<br>
+[4]  G. Marçais and C. Kingsford, “A fast, lock-free approach for efficient parallel counting of occurrences of k-mers.,” Bioinformatics, vol. 27, no. 6, pp. 764–770, Mar. 2011.<br>
+[5]  R. M. Dirks and N. A. Pierce, “A partition function algorithm for nucleic acid secondary structure including pseudoknots.,” J. Comput. Chem., vol. 24, no. 13, pp. 1664–1677, Oct. 2003.<br>
+[6]  R. M. Dirks and N. A. Pierce, “An algorithm for computing nucleic acid base-pairing probabilities including pseudoknots.,” J. Comput. Chem., vol. 25, no. 10, pp. 1295–1304, Jul. 2004.<br>
+[7]  R. M. Dirks, J. S. Bois, J. M. Schaeffer, E. Winfree, and N. A. Pierce, “Thermodynamic Analysis of Interacting Nucleic Acid Strands,” SIAM Rev., vol. 49, no. 1, pp. 65–88, Jan. 2007.<br>
+[8]  H. Li et al., “The Sequence Alignment/Map format and SAMtools.,” Bioinformatics, vol. 25, no. 16, pp. 2078–2079, Aug. 2009.<br>
+[9] Hannon, G.J. (2010) FASTX-Toolkit. http:\//hannonlab.cshl.edu fastx_toolkit<br>
 [10] P. Rice, I. Longden, and A. Bleasby, “EMBOSS: the European Molecular Biology Open Software Suite.,” Trends Genet., vol. 16, no. 6, pp. 276–277, Jun. 2000.
 
 ## Citation and License
