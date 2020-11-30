@@ -5,7 +5,8 @@
               RNA FISH probes designer
 ======================================================
 simple pipeline to design highly specific and
-customizable RNA FISH probes
+customizable RNA FISH probes against endo- and
+exogenous target sequences
 ------------------------------------------------------
 
 To be run with python 2.x
@@ -34,7 +35,7 @@ To be run with python 3.x
 //collect and configure input parameters
 params.name = ""
 params.outputName = "${params.name}_output"
-params.inFilePath = "$projectDir/UPLOAD_FASTA_HERE/${params.name}.fa"
+params.inFilePath = "$projectDir/UPLOAD_HERE/fasta/${params.name}.fa"
 params.l = 18
 params.L = 23
 params.spacing = 2
@@ -46,12 +47,12 @@ params.t = 47
 params.T = 60
 params.hybrTemp = 37
 params.genome_index = ""
-params.genomeIndexPath = "$projectDir/genomes/indexes/"
+params.genomeIndexPath = "$projectDir/UPLOAD_HERE/genome_index/"
 params.mode = "endo"
 params.strand = "-"
 params.overlapMode = "no"
 params.createIndexes = false
-params.rawGenomePath = "$projectDir/genomes/raw/${params.genome_index}.fa"
+params.rawGenomePath = "$projectDir/UPLOAD_HERE/genome_raw/${params.genome_index}.fa"
 params.jf_only = false
 params.help = ""
 
@@ -73,7 +74,7 @@ def helpMessage() {
 
   Manditory arguments:
       --name                    name of the input .fa file for which the probes are to be designer; if the file is not
-                                located in the default UPLOAD_FASTA_HERE folder, specify the path via --inFIlePath instead
+                                located in the default UPLOAD_HERE/fasta folder, specify the path via --inFIlePath instead
 
       --genome_index            the name of the genome and it's indexes against which the probes will be aligned against
 
@@ -86,7 +87,7 @@ def helpMessage() {
 
       --outputName              name of the output file; by default <name>_output
 
-      --inFilePath              path to the .fa file; by default <projectDir>/UPLOAD_FASTA_HERE/<name.fa>
+      --inFilePath              path to the .fa file; by default <projectDir>/UPLOAD_HERE/fasta/<name.fa>
 
       --genomeIndexPath         path to directory where the indexes for the genome are located;
                                 by default <projectDir>/genomes/indexes/
@@ -158,8 +159,8 @@ process createHisat2index {
     script:
     """
     hisat2-build ${rawGenomePath} ${params.genome_index}
-    mkdir -p "${projectDir}/genomes/indexes/${params.genome_index}/"
-    cp *.ht2 ${projectDir}/genomes/indexes/${params.genome_index}/
+    mkdir -p "${projectDir}/UPLOAD_HERE/genome_index/${params.genome_index}/"
+    cp *.ht2 ${projectDir}/UPLOAD_HERE/genome_index/${params.genome_index}/
     """
 }
 
@@ -196,8 +197,8 @@ process createJellyfishIndex {
     script:
     """
     bash ${buildJellyfishIndexes} ${params.l} ${params.L} ${params.genome_index} ${rawGenomePath}
-    mkdir -p "${projectDir}/genomes/indexes/${params.genome_index}/"
-    cp *.jf ${projectDir}/genomes/indexes/${params.genome_index}/
+    mkdir -p "${projectDir}/UPLOAD_HERE/genome_index/${params.genome_index}/"
+    cp *.jf ${projectDir}/UPLOAD_HERE/genome_index/${params.genome_index}/
     """
 }
 
@@ -648,7 +649,7 @@ process alignExo{
 // create and zip file containign all the output file, for endogenous sequeence
 process zipOutFilesEndo {
 
-    publishDir "${projectDir}/Results/"
+    publishDir "${projectDir}/UPLOAD_HERE/results/"
 
     output:
     path "./${params.outputName}.zip" into zip_endo
@@ -679,7 +680,7 @@ process zipOutFilesEndo {
 // create and zip file containign all the output file, for exogenous sequeence
 process zipOutFilesExo {
 
-    publishDir "${projectDir}/Results/"
+    publishDir "${projectDir}/UPLOAD_HERE/results/"
 
     input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip

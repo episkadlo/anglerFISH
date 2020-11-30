@@ -26,6 +26,12 @@ This workflow requires a couple of things to be installed before we can get star
 * Miniconda3 (or Anaconda3)
     * Check your installation with: `conda info`
     * Installation on Linux / MacOS: [https://docs.conda.io/en/latest/miniconda.html]()
+* (Optional) Git
+  * Check your installation with: `git --version`
+  * Installation on Linux: `sudo apt install git-all`
+  * Installation on MacOS: `brew install git`
+
+For Windows user, we recommend to install a Ubuntu Linux distribution on a virtual machine, such as [VM VirtualBox](www.virtualbox.org).
 
 If all requirements were met you can go ahead by installing and configuring this workflow:
 
@@ -39,6 +45,7 @@ If all requirements were met you can go ahead by installing and configuring this
     ```bash
     cd RNAFISHProbeDesigner
     ```
+    **Important**: Rename `RNAFISHProbeDesigner-main` to `RNAFISHProbeDesigner` if downloaded manually!
 
 You now have two options. Either using the Makefile or manually. We suggest to try the Makefile first and default back to the manual steps below if tools are not available.
 
@@ -170,10 +177,10 @@ Typically, you will want to specify: <default values>
 * **--mode** type of sequence: endogenous or exogenous (endo/exo) <endo>
 * **--strand** strandness of the target RNA (-/+)(for endogenous only) <->
 
-After a successful workflow execution, a zipped file will appear in `RNAFISHProbeDesigner/Results` directory, containing the following output files:
+After a successful workflow execution, a zipped file will appear in `RNAFISHProbeDesigner/UPLOAD_HERE\results` directory, containing the following output files:
 * `.fa` file with sequences of the probes that passed through all filters
 * `.fa` file wih reverse complementary sequences of probes
-* `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or .doc alignment file of probes against target RNA sequence for exogenous sequences
+* `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or `.doc` alignment file of probes against target RNA sequence for exogenous sequences
 * `.txt` file with melting temperatures of the final probes
 * `.txt` log file with stored basic parameters of the run
 
@@ -181,7 +188,7 @@ After a successful workflow execution, a zipped file will appear in `RNAFISHProb
 ## Example
 We included two RNA sequences (`smc2_dm.fa`, `renilla.fa`) that you can use to test your local workflow.
 
-1. Download the Drosophila melanogaster dm6.fa.gz genome (size: 43M) by clicking [here](https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.fa.gz).
+1. Download the *Drosophila melanogaster* dm6.fa.gz genome (size: 43M) by clicking [here](https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.fa.gz).
 
 1. Unpack it and place it in the `RNAFISHProbeDesigner/genomes/raw` directory.
 
