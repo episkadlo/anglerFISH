@@ -19,7 +19,7 @@ This workflow requires a couple of things to be installed before we can get star
     * Both Linux and MacOS ship with bash, check your version with: `bash --version`
     * Installation on Linux: `sudo apt-get update && sudo apt-get install --only-upgrade Bash`
     * Installation on MacOS: `brew install bash`
-* Java &GreaterEqual; 8
+* Java &GreaterEqual; 8 / 1.8
     * Check your installation with: `java -version`
     * Installation on Linux: `sudo apt install default-jdk`
     * Installation on MacOS: `brew install java11`
@@ -47,6 +47,18 @@ If all requirements were met you can go ahead by installing and configuring this
     ```
     **Important**: Rename `RNAFISHProbeDesigner-main` to `RNAFISHProbeDesigner` if downloaded manually!
 
+You now have two options. Either using the Makefile or manually. We suggest to try the Makefile first and default back to the manual steps below if tools are not available.
+
+### Makefile installation
+To install using the Makefile simply type `make` in the `RNAFISHProbeDesigner` directory.
+```bash
+make
+```
+If this installation worked, you can skip ahead to the [Usage](#usage) section. To uninstall you can use `make uninstall`. Below are the manual steps.
+
+### Manual installation
+If the Makefile did not work or you prefer to do things the old fashioned way please follow the steps below.
+
 1. Clone or download files from the OligoMiner [2] repository, either manually or with git:
     ```bash
     git clone https://github.com/beliveau-lab/OligoMiner.git
@@ -67,6 +79,7 @@ If all requirements were met you can go ahead by installing and configuring this
     RNAFISHProbeDesigner
     |-- helperScripts
     |   |-- buildJellyfishIndexes.sh
+    |   |-- install.sh
     |   `-- customBed2Fasta.py
     |-- OligoMiner
     |-- UPLOAD_HERE
@@ -76,13 +89,13 @@ If all requirements were met you can go ahead by installing and configuring this
     |   |-- genome_index
     |   |-- genome_raw
     |   `-- results
+    |-- Makefile
     |-- ProbeMakerEnv_python2.yml
     |-- ProbeMakerEnv_python3.yml
+    |-- README.md
     |-- main.nf
     |-- nextflow
     |-- nextflow.config
-    |-- OligoMiner-master
-    |-- README.md
     ```  
 
 1. Inside the `RNAFISHProbeDesigner` directory, where the `.yml` files are, create two conda environments ProbeMakerEnv_python2 and ProbeMakerEnv_python3:
@@ -101,6 +114,7 @@ If all requirements were met you can go ahead by installing and configuring this
     ```bash
     ./nextflow main.nf --help
     ```
+
 
 ## Usage
 ### Prepare genomic indexes for specificity filtering
@@ -141,7 +155,6 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
     ```
 
 ### Run the workflow to generate RNA FISH probes
-
 1. Copy the RNA target sequence in `.fa` format into the `RNAFISHProbeDesigner/UPLOAD_FASTA_HERE` directory.
 
 1. From `RNAFISHProbeDesigner` directory, run the workflow to design probes specifying the detailed parameters of the probes:
