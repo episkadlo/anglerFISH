@@ -32,7 +32,7 @@ This workflow requires a couple of things to be installed before we can get star
   * Installation on Linux: `sudo apt install git-all`
   * Installation on MacOS: `brew install git`
 * (Optional) make
-  * Check your installation with: `git --version`
+  * Check your installation with: `make --version`
   * Installation on Linux: `sudo apt-get install make` (try `sudo apt-get update` if the previous command does not work, and then try installing make again)
   * Installation on MacOS: `brew install make`
 
