@@ -9,8 +9,9 @@ The RNA FISH probes designer is a Nextflow [1] workflow designed to simplify and
 * [Example](#example)
 * [Output Visualization](#output-visualization)
 * [Workflow Scheme](#workflow-scheme)
+* [Guidelines for designing RNA FISH probes](#guidelines-for-designing-rna-fish-probes)
 * [References](#references)
-* [Citation and Licence](#citation-and-license)
+* [Citation and License](#citation-and-license)
 
 
 ## Installation
@@ -30,6 +31,10 @@ This workflow requires a couple of things to be installed before we can get star
   * Check your installation with: `git --version`
   * Installation on Linux: `sudo apt install git-all`
   * Installation on MacOS: `brew install git`
+* (Optional) make
+  * Check your installation with: `git --version`
+  * Installation on Linux: `sudo apt-get install make` (try `sudo apt-get update` if the previous command does not work, and then try installing make again)
+  * Installation on MacOS: `brew install make`
 
 For Windows user, we recommend to install a Ubuntu Linux distribution on a virtual machine, such as [VM VirtualBox](www.virtualbox.org).
 
@@ -185,6 +190,12 @@ After a successful workflow execution, a zipped file will appear in `RNAFISHProb
 * `.txt` log file with stored basic parameters of the run
 
 
+### Remove unnecessary files
+In order to save up the hard drive space, periodically remove the temporary large files that are obsolete after the workflow has finished its run. You can do it manually by deleting the content of the RNAFISHProbeDesigner/work/ directory, or by running:
+  ```bash
+  make clean
+  ```
+
 ## Example
 We included two RNA sequences (`smc2_dm.fa`, `renilla.fa`) that you can use to test your local workflow.
 
@@ -246,6 +257,14 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 * EMBOSS/needle [10]
 
 ![workflow_scheme](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_scheme.jpg)
+
+## Guidelines for designing RNA FISH probes.
+The workflow we present here offers a great flexibility of properties of the RNA FISH probes, allowing the users to fine-tune the probes and adjust them to their experimental conditions.
+Below we suggest a starting point of probes properties, which should be compatible with the common contemporary RNA FISH protocols:
+* minimal and maximal length of probes: 18-23nt
+* minimal spacing between probes: 2nt
+* minimal and maximal melting temperatures of the probes (Tm): 47-60&deg;C
+* formamide concentration in hybridization buffer: 10%
 
 
 ## References
