@@ -6,3 +6,4 @@ channels:
 dependencies:
   - hisat2=2.2.1
   - python=3.7
+  - seqkit=0.14.0
