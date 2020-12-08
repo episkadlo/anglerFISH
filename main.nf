@@ -437,15 +437,32 @@ process bed2fasta {
     path bed2FastaScript from "$projectDir/helperScripts/customBed2Fasta.py"
 
     output:
-    path "${params.name}_finalProbes.fasta" into bed2fastaProcessEndoZip, bed2fastaProcessExoZip, bed2fastaProcessExoAlign, bed2fastaProcessRevCompl, bed2fastaProcessTab
+    path "${params.name}_finalProbes.fasta" into bed2fastaProcessEndoZip, bed2fastaProcessExoZip, bed2fastaProcessExoAlign, bed2fastaProcessRevCompl, bed2fastaProcessTm, bed2fastaProcessTab
 
     script:
     """
     python ${bed2FastaScript}\
       -f "${params.name}_structureCheck.bed"\
-      -o "${params.name}_finalProbes"
+      -o "${params.name}_finalProbes"\
+      --header "${params.name}"
     """
 }
+
+// converst fasta file with the final probes into a tab format for easier oligos ordering
+process fasta2tab {
+
+    input:
+    path "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
+
+    output:
+    path "${params.name}_oder.tab" into fasta2tabEndoZip, fasta2tabExoZip
+
+    script:
+    """
+    seqkit fx2tab ${params.name}_finalProbes.fasta > ${params.name}_oder.tab
+    """
+}
+
 
 // get filtered probes in form of a fastq file for visualization purposes in endogenous sequences
 process bed2fastq {
@@ -569,7 +586,7 @@ process revComplement {
 process probeTm {
 
     input:
-    path "${params.name}_finalProbes.fasta" from bed2fastaProcessTab
+    path "${params.name}_finalProbes.fasta" from bed2fastaProcessTm
     path probeTmScript from "$projectDir/OligoMiner/probeTm.py"
 
     output:
@@ -658,6 +675,7 @@ process zipOutFilesEndo {
     path "${params.name}_finalProbes_sorted.bam" from alignment1ProcessZip
     path "${params.name}_finalProbes_sorted.bam.bai" from alignment2Process
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessEndoZip
+    path "${params.name}_oder.tab" from fasta2tabEndoZip
     path "${params.name}_finalProbes_revComplement.fasta" from revComplEndo
     path "${params.name}_finalProbes_Tm.txt" from probeTmEndo
     path "${params.name}_log.txt" from makeLogProcessEndo
@@ -671,6 +689,7 @@ process zipOutFilesEndo {
       ${params.name}_finalProbes_sorted.bam\
       ${params.name}_finalProbes_sorted.bam.bai\
       ${params.name}_finalProbes.fasta\
+      ${params.name}_oder.tab\
       ${params.name}_finalProbes_revComplement.fasta\
       ${params.name}_finalProbes_Tm.txt\
       ${params.name}_log.txt
@@ -684,6 +703,7 @@ process zipOutFilesExo {
 
     input:
     path "${params.name}_finalProbes.fasta" from bed2fastaProcessExoZip
+    path "${params.name}_oder.tab" from fasta2tabExoZip
     path "${params.name}_alignment.doc" from alignExoProcess
     path "${params.name}_finalProbes_revComplement.fasta" from revComplExo
     path "${params.name}_finalProbes_Tm.txt" from probeTmExo
@@ -699,6 +719,7 @@ process zipOutFilesExo {
     """
     zip ${params.outputName}.zip\
       ${params.name}_finalProbes.fasta\
+      ${params.name}_oder.tab\
       ${params.name}_alignment.doc\
       ${params.name}_finalProbes_revComplement.fasta\
       ${params.name}_finalProbes_Tm.txt\

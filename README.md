@@ -184,6 +184,7 @@ Typically, you will want to specify: <default values>
 
 After a successful workflow execution, a zipped file will appear in `RNAFISHProbeDesigner/UPLOAD_HERE\results` directory, containing the following output files:
 * `.fa` file with sequences of the probes that passed through all filters
+* `.tab` table of probes that passed through all filters, format convenient for oligos ordering
 * `.fa` file wih reverse complementary sequences of probes
 * `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or `.doc` alignment file of probes against target RNA sequence for exogenous sequences
 * `.txt` file with melting temperatures of the final probes
