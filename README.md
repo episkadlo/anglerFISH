@@ -8,7 +8,7 @@ The RNA FISH probes designer is a Nextflow [1] workflow designed to simplify and
 * [Usage](#usage)
 * [Example](#example)
 * [Output Visualization](#output-visualization)
-* [Workflow Scheme](#workflow-scheme)
+* [Workflow Explanation and Scheme](#workflow-explanation-and-scheme)
 * [Guidelines for designing RNA FISH probes](#guidelines-for-designing-rna-fish-probes)
 * [References](#references)
 * [Citation and License](#citation-and-license)
@@ -246,7 +246,11 @@ For endogenous alignments, go to the [Integrative Genomic Viewer](https://igv.or
 Then click on *Tracks > Local File* to upload the probe alignment files created by the pipeline. Select **both** the `.bam` file and `.bam.bai` file at the same time. Search for the name of your gene in the input box next to the magnifying glass 🔍 to zoom in to the gene and view the aligned probes.
 
 
-## Workflow Scheme
+## Workflow Explanation and Scheme
+Below we attach a graphical explanation of how the workflow prepares and processes the RNA FISH probes:
+![workflow_concept](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_concept.jpg)
+
+
 The workflow utilizes the following tools to automatically design RNA FISH probes:
 * Nextflow [1]
 * OligoMiner [2]
@@ -257,6 +261,7 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 * FASTX-Toolkit [9]
 * EMBOSS/needle [10]
 
+More details of workflow is constructed to integrate probe designing, as well automatically preparing necessary indexes and dictionaries from a genome.   
 ![workflow_scheme](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_scheme.jpg)
 
 ## Guidelines for designing RNA FISH probes.
