@@ -2,7 +2,7 @@
 
 /*
 ======================================================
-              RNA FISH probes designer
+                    anglerFISH
 ======================================================
 simple pipeline to design highly specific and
 customizable RNA FISH probes against endo- and
@@ -61,9 +61,9 @@ def helpMessage() {
   log.info """
 
   =========================================================================================================================
-                                                  RNA FISH probes designer
+                                                      anglerFISH
   =========================================================================================================================
-                  simple nextflow pipeline to design highly specific and customizable RNA FISH probes
+                  Simple nextflow pipeline to design highly specific and customizable RNA FISH probes.
   -------------------------------------------------------------------------------------------------------------------------
 
   Usage example:
@@ -115,7 +115,6 @@ def helpMessage() {
 
       --overlapMode             allow for overlaping probes (true/false), default: false
 
-
     Creating genome indexes for HISAT2 and Jellyfish:
       --createIndexes           trigger creating the HISAT2 and Jellyfish indexes of name specified
                                 via --genome_index tag using the default path to the .fa file; the --genome_
@@ -136,7 +135,6 @@ def helpMessage() {
       --rawGenomePath           specify path of the fasta file with genomic sequence, which will be used for
                                 creating HISAT2 and/or Jellyfish dictionaries, used with --createIndex flag;
                                 default: <projectDir>/genomes/raw/<genome_index>
-
   """.stripIndent()
 }
 
