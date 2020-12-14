@@ -1,6 +1,6 @@
-# RNA FISH probes designer
+# anglerFISH
 
-The RNA FISH probes designer is a Nextflow [1] workflow designed to simplify and automate designing oligonucleotide probes for RNA FISH single-molecule imaging. It is based primarily on OligoMiner [2], as well as several common bioinformatics tool to provide a streamlined manner of designing probes for endogenous and exogenous target RNAs.
+anglerFISH is a Nextflow [1] workflow designed to simplify and automate designing oligonucleotide probes for RNA FISH single-molecule imaging. It is based primarily on OligoMiner [2], as well as several common bioinformatics tool to provide a streamlined manner of designing probes for endogenous and exogenous target RNAs.
 
 
 ## Contents
@@ -40,22 +40,22 @@ For Windows user, we recommend to install a Ubuntu Linux distribution on a virtu
 
 If all requirements were met you can go ahead by installing and configuring this workflow:
 
-1. Navigate to a directory where you wish your workflow to be created. Clone the RNA FISH probe designer repository from GitHub with git:
+1. Navigate to a directory where you wish your workflow to be created. Clone the anglerFISH repository from GitHub with git:
     ```bash
-    git clone https://github.com/episkadlo/RNAFISHProbeDesigner.git  
+    git clone https://github.com/episkadlo/anglerFISH.git  
     ```
     or manually download the zip file containing the necessary files by navigating to the repository listed above and clicking on *Code > Download ZIP*, then unpacking it into your current directory.
 
-1. Move inside the `RNAFISHProbeDesigner` directory (containing main.nf):
+1. Move inside the `anglerFISH` directory (containing main.nf):
     ```bash
-    cd RNAFISHProbeDesigner
+    cd anglerFISH
     ```
-    **Important**: Rename `RNAFISHProbeDesigner-main` to `RNAFISHProbeDesigner` if downloaded manually!
+    **Important**: Rename `anglerFISH-main` to `anglerFISH` if downloaded manually!
 
 You now have two options. Either using the Makefile or manually. We suggest to try the Makefile first and default back to the manual steps below if tools are not available.
 
 ### Makefile installation
-To install using the Makefile simply type `make` in the `RNAFISHProbeDesigner` directory.
+To install using the Makefile simply type `make` in the `anglerFISH` directory.
 ```bash
 make
 ```
@@ -70,7 +70,7 @@ If the Makefile did not work or you prefer to do things the old fashioned way pl
     ```  
     **Important**: Rename `OligoMiner-master` to `OligoMiner` if downloaded manually!
 
-1. Inside the `RNAFISHProbeDesigner` directory, install Nextflow workflow manager:
+1. Inside the `anglerFISH` directory, install Nextflow workflow manager:
     ```bash
     wget -qO- https://get.nextflow.io | bash
     ```
@@ -78,10 +78,10 @@ If the Makefile did not work or you prefer to do things the old fashioned way pl
     ```bash
     curl -fsSL get.nextflow.io | bash
     ```
-    An executable file nextflow will appear in the RNAFISHProbeDesigner directory.  
+    An executable file nextflow will appear in the anglerFISH directory.  
     Now, your directory structure should look as follows:
     ```
-    RNAFISHProbeDesigner
+    anglerFISH
     |-- helperScripts
     |   |-- buildJellyfishIndexes.sh
     |   |-- install.sh
@@ -103,7 +103,7 @@ If the Makefile did not work or you prefer to do things the old fashioned way pl
     |-- nextflow.config
     ```  
 
-1. Inside the `RNAFISHProbeDesigner` directory, where the `.yml` files are, create two conda environments ProbeMakerEnv_python2 and ProbeMakerEnv_python3:
+1. Inside the `anglerFISH` directory, where the `.yml` files are, create two conda environments ProbeMakerEnv_python2 and ProbeMakerEnv_python3:
     ```bash
     conda env create -f ProbeMakerEnv_python2.yml
     conda env create -f ProbeMakerEnv_python3.yml
@@ -115,7 +115,7 @@ If the Makefile did not work or you prefer to do things the old fashioned way pl
 
 1. Open the `nextflow.config` file in any text editor. In the indicated places fill in the your paths to the conda environments you just created.
 
-1. To test if the workflow is ready and to see the help message with instructions of designing probes, run in the `RNAFISHProbeDesigner` directory:
+1. To test if the workflow is ready and to see the help message with instructions of designing probes, run in the `anglerFISH` directory:
     ```bash
     ./nextflow main.nf --help
     ```
@@ -135,9 +135,9 @@ Both steps described above require preparing reference genome of the target orga
     ```bash
     gzip <genome>.fa.gz
     ```
-    Place the extracted `<genome>.fa` file into `RNAFISHProbeDesigner/genomes/raw` directory.
+    Place the extracted `<genome>.fa` file into `anglerFISH/genomes/raw` directory.
 
-1. From the `RNAFISHProbeDesigner` directory, run the pipeline in mode of creating HISAT2 and Jellyfish indexes by adding a flag `--createIndexes`, supplying the genome path or name and provide length range of oligos to create Jellyfish dictionaries for these lengths range:
+1. From the `anglerFISH` directory, run the pipeline in mode of creating HISAT2 and Jellyfish indexes by adding a flag `--createIndexes`, supplying the genome path or name and provide length range of oligos to create Jellyfish dictionaries for these lengths range:
     ```bash
     ./nextflow main.nf\
         --createIndexes\
@@ -146,7 +146,7 @@ Both steps described above require preparing reference genome of the target orga
         --L <max length of probes>
     ```
     Note: The order of the flags is irrelevant.   
-    The indexes will be automatically generated and placed in the `RNAFISHProbeDesigner/genomes/indexes/<genome name> folder.
+    The indexes will be automatically generated and placed in the `anglerFISH/genomes/indexes/<genome name> folder.
 
 1. (**Optional**) Adding extra indexes for Jellyfish with different k-mer lengths.  
 If the HISAT2 index has already been prepared and you wish to add additional Jellyfish indexes (for example you already have indexes for probes 18-23-nucleotides-long, and now you wish to design probes of lengths 24-28-nucleotides-long), you have an option to create only the Jellyfish indexes for given k-mer range, and not HISAT2 index. To do it run together flags `--createIndexes --jf_only`.
@@ -160,9 +160,9 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
     ```
 
 ### Run the workflow to generate RNA FISH probes
-1. Copy the RNA target sequence in `.fa` format into the `RNAFISHProbeDesigner/UPLOAD_FASTA_HERE` directory.
+1. Copy the RNA target sequence in `.fa` format into the `anglerFISH/UPLOAD_FASTA_HERE` directory.
 
-1. From `RNAFISHProbeDesigner` directory, run the workflow to design probes specifying the detailed parameters of the probes:
+1. From `anglerFISH` directory, run the workflow to design probes specifying the detailed parameters of the probes:
     ```bash
     ./nextflow main.nf\
         --genome_index <genome name>\
@@ -182,7 +182,7 @@ Typically, you will want to specify: <default values>
 * **--mode** type of sequence: endogenous or exogenous (endo/exo) <endo>
 * **--strand** strandness of the target RNA (-/+)(for endogenous only) <->
 
-After a successful workflow execution, a zipped file will appear in `RNAFISHProbeDesigner/UPLOAD_HERE\results` directory, containing the following output files:
+After a successful workflow execution, a zipped file will appear in `anglerFISH/UPLOAD_HERE\results` directory, containing the following output files:
 * `.fa` file with sequences of the probes that passed through all filters
 * `.tab` table of probes that passed through all filters, format convenient for oligos ordering
 * `.fa` file wih reverse complementary sequences of probes
@@ -192,7 +192,7 @@ After a successful workflow execution, a zipped file will appear in `RNAFISHProb
 
 
 ### Remove unnecessary files
-In order to save up the hard drive space, periodically remove the temporary large files that are obsolete after the workflow has finished its run. You can do it manually by deleting the content of the RNAFISHProbeDesigner/work/ directory, or by running:
+In order to save up the hard drive space, periodically remove the temporary large files that are obsolete after the workflow has finished its run. You can do it manually by deleting the content of the anglerFISH/work/ directory, or by running:
   ```bash
   make clean
   ```
@@ -202,7 +202,7 @@ We included two RNA sequences (`smc2_dm.fa`, `renilla.fa`) that you can use to t
 
 1. Download the *Drosophila melanogaster* dm6.fa.gz genome (size: 43M) by clicking [here](https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.fa.gz).
 
-1. Unpack it and place it in the `RNAFISHProbeDesigner/genomes/raw` directory.
+1. Unpack it and place it in the `anglerFISH/genomes/raw` directory.
 
 1. Prepare indexes for HISAT2 and Jellyfish (for probes 18-23nt-long):
     ```bash
@@ -248,7 +248,7 @@ Then click on *Tracks > Local File* to upload the probe alignment files created 
 
 ## Workflow Explanation and Scheme
 Below we attach a graphical explanation of how the workflow prepares and processes the RNA FISH probes:
-![workflow_concept](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_concept.jpg)
+![workflow_concept](https://github.com/episkadlo/anglerFISH/blob/main/workflow_concept.jpg)
 
 
 The workflow utilizes the following tools to automatically design RNA FISH probes:
@@ -262,7 +262,7 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 * EMBOSS/needle [10]
 
 More details of workflow is constructed to integrate probe designing, as well automatically preparing necessary indexes and dictionaries from a genome.   
-![workflow_scheme](https://github.com/episkadlo/RNAFISHProbeDesigner/blob/main/workflow_scheme.jpg)
+![workflow_scheme](https://github.com/episkadlo/anglerFISH/blob/main/workflow_scheme.jpg)
 
 ## Guidelines for designing RNA FISH probes.
 The workflow we present here offers a great flexibility of properties of the RNA FISH probes, allowing the users to fine-tune the probes and adjust them to their experimental conditions.
