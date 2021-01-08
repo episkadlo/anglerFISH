@@ -1,6 +1,5 @@
 [![DOI](https://zenodo.org/badge/306061009.svg)](https://zenodo.org/badge/latestdoi/306061009)
-<!-- <img src="https://github.com/episkaldo/anglerFISH/raw/master/logo.jpg" width="200px" align="right" alt="Logo of anglerFISH."> -->
-
+<img src="https://raw.githubusercontent.com/episkadlo/anglerFISH/main/logo.jpg" width="300px" align="right" alt="Logo of anglerFISH.">
 
 # anglerFISH
 
