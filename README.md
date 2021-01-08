@@ -1,4 +1,6 @@
+[![DOI](https://zenodo.org/badge/306061009.svg)](https://zenodo.org/badge/latestdoi/306061009)
 <!-- <img src="https://github.com/episkaldo/anglerFISH/raw/master/logo.jpg" width="200px" align="right" alt="Logo of anglerFISH."> -->
+
 
 # anglerFISH
 
