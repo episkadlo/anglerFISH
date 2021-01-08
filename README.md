@@ -4,6 +4,7 @@
 
 anglerFISH is a Nextflow [1] workflow designed to simplify and automate designing oligonucleotide probes for RNA FISH single-molecule imaging. It is based primarily on OligoMiner [2], as well as several common bioinformatics tool to provide a streamlined manner of designing probes for endogenous and exogenous target RNAs.
 
+🎥 Installation and usage are described in a [YouTube tutorial](https://youtu.be/Acym4OFoSMg) or can be read below.
 
 ## Contents
 * [Installation](#installation)
@@ -14,7 +15,6 @@ anglerFISH is a Nextflow [1] workflow designed to simplify and automate designin
 * [Guidelines for designing RNA FISH probes](#guidelines-for-designing-rna-fish-probes)
 * [References](#references)
 * [Citation and License](#citation-and-license)
-
 
 ## Installation
 This workflow requires a couple of things to be installed before we can get started. Make sure you have a **POSIX compatible** operating system (Linux, MacOS, etc) running:
