@@ -138,7 +138,7 @@ Both steps described above require preparing reference genome of the target orga
     ```bash
     gzip <genome>.fa.gz
     ```
-    Place the extracted `<genome>.fa` file into `anglerFISH/genomes/raw` directory.
+    Place the extracted `<genome>.fa` file into `anglerFISH/UPLOAD_HERE/genome_raw` directory.
 
 1. From the `anglerFISH` directory, run the pipeline in mode of creating HISAT2 and Jellyfish indexes by adding a flag `--createIndexes`, supplying the genome path or name and provide length range of oligos to create Jellyfish dictionaries for these lengths range:
     ```bash
@@ -149,7 +149,7 @@ Both steps described above require preparing reference genome of the target orga
         --L <max length of probes>
     ```
     Note: The order of the flags is irrelevant.   
-    The indexes will be automatically generated and placed in the `anglerFISH/genomes/indexes/<genome name> folder.
+    The indexes will be automatically generated and placed in the `anglerFISH/UPLOAD_HERE/genome_index/<genome name> folder.
 
 1. (**Optional**) Adding extra indexes for Jellyfish with different k-mer lengths.  
 If the HISAT2 index has already been prepared and you wish to add additional Jellyfish indexes (for example you already have indexes for probes 18-23-nucleotides-long, and now you wish to design probes of lengths 24-28-nucleotides-long), you have an option to create only the Jellyfish indexes for given k-mer range, and not HISAT2 index. To do it run together flags `--createIndexes --jf_only`.
@@ -163,7 +163,7 @@ If the HISAT2 index has already been prepared and you wish to add additional Jel
     ```
 
 ### Run the workflow to generate RNA FISH probes
-1. Copy the RNA target sequence in `.fa` format into the `anglerFISH/UPLOAD_FASTA_HERE` directory.
+1. Copy the RNA target sequence in `.fa` format into the `anglerFISH/UPLOAD_HERE/fasta` directory.
 
 1. From `anglerFISH` directory, run the workflow to design probes specifying the detailed parameters of the probes:
     ```bash
@@ -185,7 +185,7 @@ Typically, you will want to specify: <default values>
 * **--mode** type of sequence: endogenous or exogenous (endo/exo) <endo>
 * **--strand** strandness of the target RNA (-/+)(for endogenous only) <->
 
-After a successful workflow execution, a zipped file will appear in `anglerFISH/UPLOAD_HERE\results` directory, containing the following output files:
+After a successful workflow execution, a zipped file will appear in `anglerFISH/UPLOAD_HERE/results` directory, containing the following output files:
 * `.fa` file with sequences of the probes that passed through all filters
 * `.tab` table of probes that passed through all filters, format convenient for oligos ordering
 * `.fa` file wih reverse complementary sequences of probes
@@ -205,7 +205,7 @@ We included two RNA sequences (`smc2_dm.fa`, `renilla.fa`) that you can use to t
 
 1. Download the *Drosophila melanogaster* dm6.fa.gz genome (size: 43M) by clicking [here](https://hgdownload.soe.ucsc.edu/goldenPath/dm6/bigZips/dm6.fa.gz).
 
-1. Unpack it and place it in the `anglerFISH/genomes/raw` directory.
+1. Unpack it and place it in the `anglerFISH/UPLOAD_HERE/genome_raw` directory.
 
 1. Prepare indexes for HISAT2 and Jellyfish (for probes 18-23nt-long):
     ```bash
