@@ -324,9 +324,11 @@ process filteringEndo {
 
     script:
     """
+    samtools view -q 60 ${params.name}_hisat2.sam  > ${params.name}_cleaned_temp.sam
+
     python ${outputCleanScript}\
       -F ${params.F}\
-      -f ${params.name}_hisat2.sam\
+      -f ${params.name}_cleaned_temp.sam\
       -o ${params.name}_cleaned\
       -u
     """
@@ -348,9 +350,11 @@ process filteringExo {
 
     script:
     """
+    samtools view -f 4 ${params.name}_hisat2.sam  > ${params.name}_cleaned_temp.sam
+
     python ${outputCleanScript}\
       -F ${params.F}\
-      -f ${params.name}_hisat2.sam\
+      -f ${params.name}_cleaned_temp.sam\
       -o ${params.name}_cleaned\
       --zero
     """

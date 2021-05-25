@@ -192,6 +192,7 @@ After a successful workflow execution, a zipped file will appear in `anglerFISH/
 * `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or `.doc` alignment file of probes against target RNA sequence for exogenous sequences
 * `.txt` file with melting temperatures of the final probes
 * `.txt` log file with stored basic parameters of the run
+* `.tab` table of probe sequences for easy oligonucleotides ordering
 
 
 ### Remove unnecessary files
@@ -227,7 +228,7 @@ To create 18-20nt long probes run:
     --strand -\
     --outputName smc2_dm_test
 ```
-The output name should be smc2_dm_test. Once run, unpack and check the log file. You should get 165 final probes (out of 174 probes before filtering).
+The output name should be smc2_dm_test. Once run, unpack and check the log file. You should get 163 final probes (out of 174 probes before filtering).
 
 #### Endogenous RNA target
 Design probes for an exogenous RNA coding renilla insterted into *D.melanogaster* cells. The sequence is stored in the `renilla.fa` file. Probes are supposed to be 18-23nt-long. The output name should be renilla_test
