@@ -39,6 +39,8 @@ This workflow requires a couple of things to be installed before we can get star
   * Installation on Linux: `sudo apt-get install make` (try `sudo apt-get update` if the previous command does not work, and then try installing make again)
   * Installation on MacOS: `brew install make`
 
+**NOTE:** Some MacOS user have been recently experiencing problems in installation of nextflow and anglerFISH workflow. In case you cannot install the anglerFISH workflow, you can always use the [VM VirtualBox](www.virtualbox.org) to install Ubuntu on your MacOS, and proceed with the manual.
+
 For Windows user, we recommend to install a Ubuntu Linux distribution on a virtual machine, such as [VM VirtualBox](www.virtualbox.org).
 
 If all requirements were met you can go ahead by installing and configuring this workflow:
@@ -192,7 +194,7 @@ After a successful workflow execution, a zipped file will appear in `anglerFISH/
 * `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or `.doc` alignment file of probes against target RNA sequence for exogenous sequences
 * `.txt` file with melting temperatures of the final probes
 * `.txt` log file with stored basic parameters of the run
-* `.tab` table of probe sequences for easy oligonucleotides ordering
+
 
 
 ### Remove unnecessary files
@@ -268,7 +270,7 @@ The workflow utilizes the following tools to automatically design RNA FISH probe
 More details of workflow is constructed to integrate probe designing, as well automatically preparing necessary indexes and dictionaries from a genome.   
 ![workflow_scheme](https://github.com/episkadlo/anglerFISH/blob/main/workflow_scheme.jpg)
 
-## Guidelines for designing RNA FISH probes.
+## Guidelines for designing RNA FISH probes
 The workflow we present here offers a great flexibility of properties of the RNA FISH probes, allowing the users to fine-tune the probes and adjust them to their experimental conditions.
 Below we suggest a starting point of probes properties, which should be compatible with the common contemporary RNA FISH protocols:
 * minimal and maximal length of probes: 18-23nt
@@ -276,6 +278,8 @@ Below we suggest a starting point of probes properties, which should be compatib
 * minimal and maximal melting temperatures of the probes (Tm): 47-60&deg;C
 * formamide concentration in hybridization buffer: 10%
 
+#### Note about long probes and formamide concentration
+If you design longer probes, you will need to increase the formamide concentration in hybridization and wash buffer to allow decrease the effective melting temperature of the probes. For probes 45-50 nucleotides long, we usually use 50% formamide concentration in the buffers. In that case, remember to adjust the pH of the buffers to around 7.
 
 ## References
 [1]  P. Di Tommaso, M. Chatzou, E. W. Floden, P. P. Barja, E. Palumbo, and C. Notredame, “Nextflow enables reproducible computational workflows,” Nat. Biotechnol., vol. 35, no. 4, pp. 316–319, 2017.<br>
