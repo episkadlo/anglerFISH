@@ -7,6 +7,8 @@
 simple pipeline to design highly specific and
 customizable RNA FISH probes against endo- and
 exogenous target sequences
+
+version 1.1
 ------------------------------------------------------
 
 To be run with python 2.x
@@ -623,6 +625,7 @@ process makeLog {
 
     run_date=\$(date)
 
+    echo -e "anglerFISH version 1.1" >> ${params.name}_log.txt
     echo -e "Sequence name: ${params.name}\n" >> ${params.name}_log.txt
     echo -e "Date of run: \$run_date \n" >> ${params.name}_log.txt
     echo -e "\nParameters of the run:\n" >> "${params.name}_log.txt"

@@ -23,23 +23,29 @@ This workflow requires a couple of things to be installed before we can get star
     * Both Linux and MacOS ship with bash, check your version with: `bash --version`
     * Installation on Linux: `sudo apt-get update && sudo apt-get install --only-upgrade Bash`
     * Installation on MacOS: `brew install bash`
-* Java &GreaterEqual; 8 / 1.8
+* Java &GreaterEqual; 8 / 1.8; we suggest using OpenJDK
     * Check your installation with: `java -version`
     * Installation on Linux: `sudo apt install default-jdk`
-    * Installation on MacOS: `brew install java11`
+    * Installation on MacOS:   
+        `brew tap homebrew/cask-versions`  
+        `brew update`  
+        `brew tap homebrew/cask`  
+        `brew tap adoptopenjdk/adoptopenjdk`  
+        `brew install --cask adoptopenjdk11`
 * Miniconda3 (or Anaconda3)
     * Check your installation with: `conda info`
-    * Installation on Linux / MacOS: [https://docs.conda.io/en/latest/miniconda.html]()
-* (Optional) Git
+    * Installation on Linux / MacOS: [https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html)
+    * Important: restart your terminal after installing conda!
+* Git
   * Check your installation with: `git --version`
   * Installation on Linux: `sudo apt install git-all`
   * Installation on MacOS: `brew install git`
-* (Optional) make
+* make
   * Check your installation with: `make --version`
   * Installation on Linux: `sudo apt-get install make` (try `sudo apt-get update` if the previous command does not work, and then try installing make again)
   * Installation on MacOS: `brew install make`
 
-**NOTE:** Some MacOS user have been recently experiencing problems in installation of nextflow and anglerFISH workflow. In case you cannot install the anglerFISH workflow, you can always use the [VM VirtualBox](www.virtualbox.org) to install Ubuntu on your MacOS, and proceed with the manual.
+**NOTE:** Some MacOS user have been recently experiencing problems in installation of nextflow and anglerFISH workflow. In case you cannot install the anglerFISH workflow, you can always use the [VM VirtualBox](www.virtualbox.org) to install Ubuntu on your MacOS, and proceed with the manual for Linux.
 
 For Windows user, we recommend to install a Ubuntu Linux distribution on a virtual machine, such as [VM VirtualBox](www.virtualbox.org).
 
