@@ -8,12 +8,13 @@ simple pipeline to design highly specific and
 customizable RNA FISH probes against endo- and
 exogenous target sequences
 
-version 1.1
+version 1.2
 ------------------------------------------------------
 
 To be run with python 2.x
 	createJellyfishIndex
   blockParse
+  outputUnfiltered
   filteringEndo
   filteringExo
   checkStrand
@@ -56,6 +57,7 @@ params.overlapMode = "no"
 params.createIndexes = false
 params.rawGenomePath = "$projectDir/UPLOAD_HERE/genome_raw/${params.genome_index}.fa"
 params.jf_only = false
+params.outputUnfiltered = false
 params.help = ""
 
 // help message text
@@ -116,6 +118,9 @@ def helpMessage() {
       --hybrTemp                hybridization temperature (degC), default: 37
 
       --overlapMode             allow for overlaping probes (true/false), default: false
+
+      --outputUnfiltered        using this flag you will also receive a fasta file containing sequences of all the unfiltered
+                                probes included in the zip containing the final results, default: false
 
     Creating genome indexes for HISAT2 and Jellyfish:
       --createIndexes           trigger creating the HISAT2 and Jellyfish indexes of name specified
@@ -231,7 +236,7 @@ process blockParse {
     path inFile from "${params.inFilePath}"
 
     output:
-    path "${params.name}_blockparse.fastq" into blockparseProcess, blockparseProcess_count
+    path "${params.name}_blockparse.fastq" into blockparseProcess, blockparseProcess_count, blockparseProcess_unfiltered
 
     script:
     if( params.overlapMode == "no" )
@@ -290,6 +295,31 @@ process countInitialProbes {
     """
 }
 
+//if the --outputFiltered flag was used with this workflow, produce a fasta file with the unfiltered probeTmScript
+process outputUnfiltered {
+
+    input:
+    path "${params.name}_blockparse.fastq" from blockparseProcess_unfiltered
+
+    output:
+    path "${params.name}_unfiltered.fasta" into unfilteredProbesEndo, unfilteredProbesExo
+
+    script:
+
+    if (params.outputUnfiltered == true)
+      """
+      fastq_to_fasta\
+        -r\
+        -i ${params.name}_blockparse.fastq\
+        -o ${params.name}_unfiltered.fasta
+        """
+
+    else
+      """
+      touch ${params.name}_unfiltered.fasta
+      """
+}
+
 // use HISAT2 to align the candidate probes to genome specified in genome_index
 process initial_mapping {
 
@@ -310,7 +340,7 @@ process initial_mapping {
     """
 }
 
-// filter out unspecific cprobes using Oligominer's outputClean script for endogenous
+// filter out unspecific probes using Oligominer's outputClean script for endogenous
 // sequence, keeping only the probes that align exacly once (flag -u)
 process filteringEndo {
 
@@ -668,7 +698,30 @@ process alignExo{
     """
 }
 
-// create and zip file containign all the output file, for endogenous sequeence
+
+// create an empty zip if no --outputUnfiltered or zip containing the ${params.name}_unfiltered.fasta file
+process createTempZip {
+    input:
+    path "${params.name}_unfiltered.fasta" from unfilteredProbesExo.mix(unfilteredProbesEndo)
+
+    output:
+    path "./${params.outputName}.zip" into temp_zip_endo, temp_zip_exo
+
+    script:
+    if (params.outputUnfiltered == true)
+      """
+      zip ${params.outputName}.zip ${params.name}_unfiltered.fasta
+      """
+
+    else
+      """
+      touch foo.txt
+      zip ${params.outputName}.zip foo.txt
+      zip -d ${params.outputName}.zip foo.txt
+      """
+}
+
+// update the zip file containig all the output file, for endogenous sequence
 process zipOutFilesEndo {
 
     publishDir "${projectDir}/UPLOAD_HERE/results/"
@@ -684,24 +737,29 @@ process zipOutFilesEndo {
     path "${params.name}_finalProbes_revComplement.fasta" from revComplEndo
     path "${params.name}_finalProbes_Tm.txt" from probeTmEndo
     path "${params.name}_log.txt" from makeLogProcessEndo
+    path "./${params.outputName}.zip" from temp_zip_endo
 
     when:
     params.mode == "endo"
 
     script:
     """
-    zip ${params.outputName}.zip\
+    zip -u\
+      ${params.outputName}.zip\
       ${params.name}_finalProbes_sorted.bam\
       ${params.name}_finalProbes_sorted.bam.bai\
       ${params.name}_finalProbes.fasta\
       ${params.name}_oder.tab\
       ${params.name}_finalProbes_revComplement.fasta\
       ${params.name}_finalProbes_Tm.txt\
-      ${params.name}_log.txt
+      ${params.name}_log.txt\
     """
 }
 
-// create and zip file containign all the output file, for exogenous sequeence
+
+
+
+// update the zip file containign all the output file, for exogenous sequence
 process zipOutFilesExo {
 
     publishDir "${projectDir}/UPLOAD_HERE/results/"
@@ -713,6 +771,7 @@ process zipOutFilesExo {
     path "${params.name}_finalProbes_revComplement.fasta" from revComplExo
     path "${params.name}_finalProbes_Tm.txt" from probeTmExo
     path "${params.name}_log.txt" from makeLogProcessExo
+    path "./${params.outputName}.zip" from temp_zip_exo
 
     output:
     path "./${params.outputName}.zip" into zip_exo
@@ -728,6 +787,6 @@ process zipOutFilesExo {
       ${params.name}_alignment.doc\
       ${params.name}_finalProbes_revComplement.fasta\
       ${params.name}_finalProbes_Tm.txt\
-      ${params.name}_log.txt
+      ${params.name}_log.txt\
     """
 }

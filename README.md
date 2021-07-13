@@ -194,13 +194,13 @@ Typically, you will want to specify: <default values>
 * **--strand** strandness of the target RNA (-/+)(for endogenous only) <->
 
 After a successful workflow execution, a zipped file will appear in `anglerFISH/UPLOAD_HERE/results` directory, containing the following output files:
-* `.fa` file with sequences of the probes that passed through all filters
+* `.fasta` file with sequences of the probes that passed through all filters
 * `.tab` table of probes that passed through all filters, format convenient for oligos ordering
-* `.fa` file wih reverse complementary sequences of probes
+* `.fasta` file wih reverse complementary sequences of probes
 * `.bam` and `.bam.bai` alignment files of probes against genome for endogenous sequences, or `.doc` alignment file of probes against target RNA sequence for exogenous sequences
 * `.txt` file with melting temperatures of the final probes
 * `.txt` log file with stored basic parameters of the run
-
+* (optional) `.fasta` file containing the unfiltered probes (probes before specificity or structure checks), if the workflow was run with the **--outputUnfiltered** flag
 
 
 ### Remove unnecessary files
@@ -238,7 +238,7 @@ To create 18-20nt long probes run:
 ```
 The output name should be smc2_dm_test. Once run, unpack and check the log file. You should get 163 final probes (out of 174 probes before filtering).
 
-#### Endogenous RNA target
+#### Exogenous RNA target
 Design probes for an exogenous RNA coding renilla insterted into *D.melanogaster* cells. The sequence is stored in the `renilla.fa` file. Probes are supposed to be 18-23nt-long. The output name should be renilla_test
 ```bash
 ./nextflow main.nf\
