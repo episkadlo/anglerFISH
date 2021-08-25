@@ -8,7 +8,7 @@ simple pipeline to design highly specific and
 customizable RNA FISH probes against endo- and
 exogenous target sequences
 
-version 1.2
+version 1.3
 ------------------------------------------------------
 
 To be run with python 2.x
@@ -120,7 +120,7 @@ def helpMessage() {
       --overlapMode             allow for overlaping probes (true/false), default: false
 
       --outputUnfiltered        using this flag you will also receive a fasta file containing sequences of all the unfiltered
-                                probes included in the zip containing the final results, default: false
+                                probes included in the zip containing the final results, default: false (no flag)
 
     Creating genome indexes for HISAT2 and Jellyfish:
       --createIndexes           trigger creating the HISAT2 and Jellyfish indexes of name specified
@@ -311,8 +311,11 @@ process outputUnfiltered {
       fastq_to_fasta\
         -r\
         -i ${params.name}_blockparse.fastq\
+        -o ${params.name}_unfiltered_wrongOrientation.fasta
+      fastx_reverse_complement\
+        -i ${params.name}_unfiltered_wrongOrientation.fasta\
         -o ${params.name}_unfiltered.fasta
-        """
+      """
 
     else
       """
@@ -366,7 +369,7 @@ process filteringEndo {
     """
 }
 
-// filter out unspecific cprobes using Oligominer's outputClean script for ezogenous
+// filter out unspecific probes using Oligominer's outputClean script for ezogenous
 // sequence, keeping only the probes that do not align to the genome(flag --zero)
 process filteringExo {
 
@@ -655,11 +658,12 @@ process makeLog {
 
     run_date=\$(date)
 
-    echo -e "anglerFISH version 1.1" >> ${params.name}_log.txt
+    echo -e "anglerFISH version 1.3" >> ${params.name}_log.txt
     echo -e "Sequence name: ${params.name}\n" >> ${params.name}_log.txt
     echo -e "Date of run: \$run_date \n" >> ${params.name}_log.txt
     echo -e "\nParameters of the run:\n" >> "${params.name}_log.txt"
     echo -e "Type of sequence (endogenous / exogenous): ${params.mode}\n" >> ${params.name}_log.txt
+    echo -e "Strand of the target RNA (for endogenous targets): ${params.strand}\n" >> ${params.name}_log.txt
     echo -e "Target organism genome: ${params.genome_index}\n" >> ${params.name}_log.txt
     echo -e "Min probe length, nt: ${params.l}\n" >> ${params.name}_log.txt
     echo -e "Max probe length, nt: ${params.L}\n" >> ${params.name}_log.txt
@@ -670,7 +674,7 @@ process makeLog {
     echo -e "min Tm, degC: ${params.t}\n" >> ${params.name}_log.txt
     echo -e "max Tm, degC: ${params.T}\n" >> ${params.name}_log.txt
     echo -e "\n${initNprobes}\n" >> ${params.name}_log.txt
-    echo -e "\n${finalNprobes}" >> ${params.name}_log.txt
+    echo -e "${finalNprobes}" >> ${params.name}_log.txt
     """
 }
 
